@@ -1,4 +1,4 @@
-# Spring Dubbo Distributed REST Service Development Practice  
+# Spring Dubbo Distributed REST Service
 
 This project demonstrates best practices for developing **distributed RESTful services** using **Spring Boot** and **Apache Dubbo**. It focuses on building a **high-performance, scalable, and modular microservices architecture** while leveraging Dubbo’s RPC framework for efficient service communication.  
 
