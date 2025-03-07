@@ -52,7 +52,7 @@ public class BookRepositoryTest extends BaseTest {
         PrintBook ret = printBookRepository.saveAndFlush(printBook);
         Assertions.assertTrue(ret.getId() > 0);
         Book ret2 = bookRepository.findById(ret.getId()).get();
-        Assertions.assertNotNull(ret22);
+        Assertions.assertNotNull(ret2);
         List<PrintBook> printBooks = printBookRepository.findAll();
         Assertions.assertTrue(printBooks.size() > 0);
     }
