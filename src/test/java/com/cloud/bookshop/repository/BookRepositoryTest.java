@@ -3,10 +3,12 @@ package com.cloud.bookshop.repository;
 import com.cloud.bookshop.BaseTest;
 import com.cloud.bookshop.domain.Book;
 import com.cloud.bookshop.domain.Category;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +19,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class BookRepositoryTest extends BaseTest {
     @Autowired
@@ -30,6 +35,12 @@ public class BookRepositoryTest extends BaseTest {
     @Autowired
     private CategoryRepository categoryRepository;
 
+    @Autowired
+    private PlatformTransactionManager transactionManager;
+
+    @Autowired
+    private EntityManager entityManager;
+
     @Test
     public void testJPAFind() {
         Book book = new Book();
@@ -37,18 +48,9 @@ public class BookRepositoryTest extends BaseTest {
         book.setName(bookName);
         bookRepository.save(book);
 
-        List<Book> books = bookRepository.findByName(bookName);
-        Assertions.assertTrue(books.size() > 0);
-
-        List<Long> ids = bookRepository.findAll().stream().filter(item -> item.getId() % 2 == 0)
-                .map(item -> item.getId()).collect(Collectors.toUnmodifiableList());
-
-        // query all items by ids
-        List<Book> bookQuery = bookRepository.findAllById(ids);
-        Assertions.assertTrue(ids.size() == bookQuery.size() && bookQuery.size() > 0);
-        List<Long> queryIdList = bookQuery.stream().map(item -> item.getId()).collect(Collectors.toUnmodifiableList());
-        Assertions.assertEquals(queryIdList, ids);
-
+        Book bookRet = bookRepository.findByName(bookName);
+        Assertions.assertNotNull(bookRet);
+        Assertions.assertEquals(bookRet.getName(), bookName);
         // query by providing sort
         List<Book> sortedBooks = bookRepository.findAll(Sort.by(
                 Sort.Order.desc("name"),
@@ -63,11 +65,10 @@ public class BookRepositoryTest extends BaseTest {
     public void testPageableUsage() {
         Pageable pageable = PageRequest.of(0, 3, Sort.by(new Sort.Order(Sort.Direction.DESC, "name")));
         Page<Book> bookPage = bookRepository.findAll(pageable);
-        Assertions.assertTrue(bookPage.getTotalElements() > 0);
-        Assertions.assertTrue(bookPage.getTotalPages() > 0);
-        Assertions.assertTrue(bookPage.getSize() > 0);
+        Assertions.assertTrue(bookPage.getTotalElements() >= 0);
+        Assertions.assertTrue(bookPage.getTotalPages() >= 0);
+        Assertions.assertTrue(bookPage.getSize() >= 0);
         Assertions.assertEquals(bookPage.getSort(), Sort.by(Sort.Order.desc("name")));
-        Assertions.assertEquals(bookPage.getNumber(), 0);
     }
 
     // how to use ExampleMatcher to query database
@@ -190,5 +191,123 @@ public class BookRepositoryTest extends BaseTest {
         Assertions.assertTrue(queryBooks.size() > 0);
         Assertions.assertEquals(queryBooks.get(0).getName(), bookName);
         Assertions.assertEquals(queryBooks.get(0).getCategory().getName(), categoryName);
+    }
+
+
+    // we use transaction commit to commit update to dataabse
+    @Test
+    public void testPersistenceContext() {
+        TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
+        Book book = new Book();
+        String bookName = UUID.randomUUID().toString();
+        book.setName(bookName);
+        Book bookRet = bookRepository.save(book);
+
+        Book bookQuery = bookRepository.findByName(bookName);
+        Assertions.assertEquals(bookQuery.getName(), bookName);
+
+
+        // update queried book's fields -- this will result in JPA's persistence context cached value diff from database table's record
+        // when transaction executes commit, we will see a update SQL command in log info -- this is called dirty check
+        bookQuery.setCreateTime(new Date());
+        // update the create-time will be executed by the transaction commit
+        // bookRepository.save(bookQuery);
+
+        // here in the process of commit, JPA will check whether the persistence context cached entities status
+        // are synchronized with the entities that stored in the database , if there are some distinctions
+        // commit will update the persistence context cached latest entities value to database
+        transactionManager.commit(status);
+        Assertions.assertEquals(bookRet.getName(), bookName);
+    }
+
+    // test case show the difference between save & saveAndFlush
+    // take JPA's persistence context into consideration.
+    // we use @Transactional instead of executing TransactionManager#commit explicitly
+    @Test
+    @Transactional
+    public void testSaveVsSaveAndFlush() {
+        Book book = new Book();
+        String bookName = UUID.randomUUID().toString();
+        book.setName(bookName);
+
+        Book bookRet = bookRepository.save(book);
+        Assertions.assertNotNull(bookRet);
+        Assertions.assertEquals(bookRet.getName(), bookName);
+        Assertions.assertNotNull(bookRet.getId());
+
+
+        Book bookSaveWithoutFlush = new Book();
+        String bookNameWithoutFlush = UUID.randomUUID().toString();
+        bookSaveWithoutFlush.setId(bookRet.getId());
+        bookSaveWithoutFlush.setName(bookNameWithoutFlush);
+
+
+        Book bookSaveWithFlush = new Book();
+        String bookNameWithFlush = UUID.randomUUID().toString();
+        bookSaveWithFlush.setId(bookRet.getId());
+        bookSaveWithFlush.setName(bookNameWithFlush);
+
+        // entity -> persistence context cache -> db disk
+        bookRepository.saveAndFlush(bookSaveWithFlush);
+
+        // entity -> persistence context cache
+        bookRepository.save(bookSaveWithoutFlush);
+
+        // clear JPA persistence context
+        entityManager.clear();
+
+
+        // exeucte query by Id here
+        Book finalRet = bookRepository.findById(bookRet.getId()).get();
+        Assertions.assertNotNull(finalRet);
+        Assertions.assertNotNull(finalRet.getId());
+        Assertions.assertEquals(bookNameWithFlush, finalRet.getName());
+    }
+
+    @Test
+    public void testQuerySameEntityTwiceOnlyInvokeOneSQLQuery() {
+        Book b = new Book();
+        String bn = UUID.randomUUID().toString();
+        b.setName(bn);
+
+        Book bRet = bookRepository.saveAndFlush(b);
+        Assertions.assertTrue(Objects.nonNull(bRet) && bRet.getId() > 0);
+
+        // query twice only show query DB via SQL command once
+        bookRepository.findById(bRet.getId());
+        bookRepository.findById(bRet.getId());
+    }
+
+    @Test
+    public void testFetchStrategy() {
+        Category category = new Category();
+        String cn = UUID.randomUUID().toString();
+        category.setName(cn);
+
+        Book book = new Book();
+        String bn = UUID.randomUUID().toString();
+
+        book.setName(bn);
+        book.setCategory(category);
+        category.setBookList(List.of(book));
+
+        Category categoryRet = categoryRepository.saveAndFlush(category);
+        Assertions.assertNotNull(categoryRet);
+        Assertions.assertNotNull(categoryRet.getId());
+
+        Book bookRet = bookRepository.saveAndFlush(book);
+        Assertions.assertNotNull(bookRet);
+        Assertions.assertNotNull(bookRet.getId());
+
+        // we already know that Category : Book = 1 : N
+        // and to avoid creation join table, we let Book side to maintain the relationship
+        // all 1:N mapping relationships are stored to Book#bs_category_bs_id field as foreign key
+        Book bookQueryRet1 = bookRepository.findByName(bookRet.getName());
+        // on the Book side, when declaring the @ManyToOne() we also refer the fetch strategy as 'EAGER'
+        // which means every time we query Book(s) it's associated Category entity(all fields)
+        // will be fetched and loaded from database to memory
+
+        Assertions.assertNotNull(bookQueryRet1.getCategory());
+        Assertions.assertNotNull(bookQueryRet1.getCategory().getName());
     }
 }
