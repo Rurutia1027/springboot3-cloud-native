@@ -43,6 +43,20 @@ public class BookRepositoryTest extends BaseTest {
     @Autowired
     private EntityManager entityManager;
 
+    @Autowired
+    private PrintBookRepository printBookRepository;
+
+    @Test
+    public void testPrintBookRepository() {
+        PrintBook printBook = new PrintBook();
+        PrintBook ret = printBookRepository.saveAndFlush(printBook);
+        Assertions.assertTrue(ret.getId() > 0);
+        Book ret2 = bookRepository.findById(ret.getId()).get();
+        Assertions.assertNotNull(ret22);
+        List<PrintBook> printBooks = printBookRepository.findAll();
+        Assertions.assertTrue(printBooks.size() > 0);
+    }
+
     @Test
     public void testJPAFind() {
         Book book = new Book();
