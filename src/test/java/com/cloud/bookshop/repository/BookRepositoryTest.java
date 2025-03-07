@@ -2,6 +2,7 @@ package com.cloud.bookshop.repository;
 
 import com.cloud.bookshop.BaseTest;
 import com.cloud.bookshop.domain.Book;
+import com.cloud.bookshop.domain.Category;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
@@ -18,12 +19,16 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class BookRepositoryTest extends BaseTest {
     @Autowired
     private BookRepository bookRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @Test
     public void testJPAFind() {
@@ -114,7 +119,7 @@ public class BookRepositoryTest extends BaseTest {
 
     // test case to show how to use JpaSpecificationExecutor to execute dynamic query
     @Test
-    public void testJpaSpecificationExecutor() {
+    public void testJpaSpecificationWithSingleCondition() {
         // first, create mock book instance and save to db
         String bookName = UUID.randomUUID().toString();
         Book book = new Book();
@@ -140,5 +145,50 @@ public class BookRepositoryTest extends BaseTest {
         Assertions.assertNotEquals(null, bookRet2);
         Assertions.assertEquals(bookName, bookRet2.getName());
 
+    }
+
+    @Test
+    public void testJpaSpecificationWithMultipleQueryCondition() {
+        // first create two book item
+        String bookName = UUID.randomUUID().toString();
+        String categoryName = UUID.randomUUID().toString();
+
+        Book b1 = new Book();
+        b1.setName(bookName);
+
+        // Category - Book = 1 : N
+        Category category = new Category();
+        category.setName(categoryName);
+        category.setBookList(List.of(b1));
+        // save category first
+        Category categoryRet = categoryRepository.save(category);
+        Assertions.assertTrue(categoryRet.getId() > 0 && category.getBookList().size() > 0);
+
+        // then save book
+        b1.setCategory(category);
+        Book bookRet = bookRepository.save(b1);
+        Assertions.assertTrue(Objects.nonNull(bookRet));
+        Assertions.assertTrue(bookRet.getCategory().getName().equals(categoryName));
+        // then we define the Specification for dynamic query
+        Specification<Book> spec = new Specification<Book>() {
+            @Override
+            public Predicate toPredicate(Root<Book> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+                // condition 1
+                Predicate p1 = criteriaBuilder.equal(root.get("name"), bookName);
+                // condition 2
+                Predicate p2 = criteriaBuilder.equal(root.get("category"), category);
+
+                // join the condition together via AND
+                Predicate p3 = criteriaBuilder.and(p1, p2);
+
+                return p3;
+            }
+        };
+
+        // then query via the spec we combine the query conditions with 'AND' relationship
+        List<Book> queryBooks = bookRepository.findAll(spec);
+        Assertions.assertTrue(queryBooks.size() > 0);
+        Assertions.assertEquals(queryBooks.get(0).getName(), bookName);
+        Assertions.assertEquals(queryBooks.get(0).getCategory().getName(), categoryName);
     }
 }
