@@ -49,8 +49,8 @@ public class BookRepositoryTest extends BaseTest {
         book.setName(bookName);
         bookRepository.save(book);
 
-        List<Book> books = bookRepository.findByName(bookName);
-        Assertions.assertTrue(books.size() > 0);
+        Book bookRet = bookRepository.findByName(bookName);
+        Assertions.assertNotNull(bookRet);
 
         List<Long> ids = bookRepository.findAll().stream().filter(item -> item.getId() % 2 == 0)
                 .map(item -> item.getId()).collect(Collectors.toUnmodifiableList());
@@ -214,7 +214,7 @@ public class BookRepositoryTest extends BaseTest {
         book.setName(bookName);
         Book bookRet = bookRepository.save(book);
 
-        Book bookQuery = bookRepository.findByName(bookName).get(0);
+        Book bookQuery = bookRepository.findByName(bookName);
         Assertions.assertEquals(bookQuery.getName(), bookName);
 
 
@@ -313,12 +313,12 @@ public class BookRepositoryTest extends BaseTest {
         // we already know that Category : Book = 1 : N
         // and to avoid creation join table, we let Book side to maintain the relationship
         // all 1:N mapping relationships are stored to Book#bs_category_bs_id field as foreign key
-        Book bookQueryRet1 = bookRepository.findByName(bookRet.getName()).get(0);
-
+        Book bookQueryRet1 = bookRepository.findByName(bookRet.getName());
         // on the Book side, when declaring the @ManyToOne() we also refer the fetch strategy as 'EAGER'
         // which means every time we query Book(s) it's associated Category entity(all fields)
         // will be fetched and loaded from database to memory
 
         Assertions.assertNotNull(bookQueryRet1.getCategory());
+        Assertions.assertNotNull(bookQueryRet1.getCategory().getName());
     }
 }

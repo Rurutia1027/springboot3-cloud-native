@@ -3,6 +3,8 @@ package com.cloud.bookshop.domain;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.OneToMany;
 import lombok.Data;
 
@@ -11,6 +13,8 @@ import java.util.List;
 // Category:Book = 1:N
 @Entity
 @Data
+@NamedEntityGraph(name = "Book.fetch.category.and.authors",
+        attributeNodes = {@NamedAttributeNode("category"), @NamedAttributeNode("authors")})
 public class Book extends DomainImpl {
     private String name;
 
