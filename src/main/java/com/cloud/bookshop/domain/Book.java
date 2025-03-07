@@ -1,10 +1,10 @@
 package com.cloud.bookshop.domain;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.Data;
-import lombok.ToString;
 
 import java.util.List;
 
@@ -20,7 +20,7 @@ public class Book extends DomainImpl {
     // fetch category only when user invoke it get function
     // @ManyToOne(fetch = FetchType.LAZY)
     // optional = true, this means we must specify Category of one Book
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private Category category;
 
     @OneToMany(mappedBy = "book")

@@ -273,7 +273,52 @@ public class BookRepositoryTest extends BaseTest {
         Assertions.assertNotNull(finalRet);
         Assertions.assertNotNull(finalRet.getId());
         Assertions.assertEquals(bookNameWithFlush, finalRet.getName());
+    }
 
+    @Test
+    public void testQuerySameEntityTwiceOnlyInvokeOneSQLQuery() {
+        Book b = new Book();
+        String bn = UUID.randomUUID().toString();
+        b.setName(bn);
 
+        Book bRet = bookRepository.saveAndFlush(b);
+        Assertions.assertTrue(Objects.nonNull(bRet) && bRet.getId() > 0);
+
+        // query twice only show query DB via SQL command once
+        bookRepository.findById(bRet.getId());
+        bookRepository.findById(bRet.getId());
+    }
+
+    @Test
+    public void testFetchStrategy() {
+        Category category = new Category();
+        String cn = UUID.randomUUID().toString();
+        category.setName(cn);
+
+        Book book = new Book();
+        String bn = UUID.randomUUID().toString();
+
+        book.setName(bn);
+        book.setCategory(category);
+        category.setBookList(List.of(book));
+
+        Category categoryRet = categoryRepository.saveAndFlush(category);
+        Assertions.assertNotNull(categoryRet);
+        Assertions.assertNotNull(categoryRet.getId());
+
+        Book bookRet = bookRepository.saveAndFlush(book);
+        Assertions.assertNotNull(bookRet);
+        Assertions.assertNotNull(bookRet.getId());
+
+        // we already know that Category : Book = 1 : N
+        // and to avoid creation join table, we let Book side to maintain the relationship
+        // all 1:N mapping relationships are stored to Book#bs_category_bs_id field as foreign key
+        Book bookQueryRet1 = bookRepository.findByName(bookRet.getName()).get(0);
+
+        // on the Book side, when declaring the @ManyToOne() we also refer the fetch strategy as 'EAGER'
+        // which means every time we query Book(s) it's associated Category entity(all fields)
+        // will be fetched and loaded from database to memory
+
+        Assertions.assertNotNull(bookQueryRet1.getCategory());
     }
 }
