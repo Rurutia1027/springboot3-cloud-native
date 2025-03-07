@@ -1,10 +1,22 @@
 # Design Doc
 
-## E-R Diagram
+## Introduction
 
 In bookstore this project we have defined multiple domain entities: Author, AuthorInfo, Book, BookAuthor, Category.
 
 Their E-R Relationships are shown in the following diagrams.
+
+
+---
+
+### E-R Diagram
+
+![img.png](entity-relationship.png)
+
+### Database Table Diagram 
+![img.png](db-tables.png)
+
+## Entity Relationships
 
 ### Entity Relationship: Author - Address (1:1)
 
