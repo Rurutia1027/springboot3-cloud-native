@@ -2,6 +2,10 @@ package com.cloud.bookshop.repository;
 
 import com.cloud.bookshop.BaseTest;
 import com.cloud.bookshop.domain.Book;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 import java.util.UUID;
@@ -105,5 +110,35 @@ public class BookRepositoryTest extends BaseTest {
         Assertions.assertTrue(bookPage.getContent().size() > 0);
         Book queryBookItem = bookPage.getContent().get(0);
         Assertions.assertEquals(queryBookItem.getName(), bookName);
+    }
+
+    // test case to show how to use JpaSpecificationExecutor to execute dynamic query
+    @Test
+    public void testJpaSpecificationExecutor() {
+        // first, create mock book instance and save to db
+        String bookName = UUID.randomUUID().toString();
+        Book book = new Book();
+        book.setName(bookName);
+
+        Book bookRet = bookRepository.save(book);
+        Assertions.assertEquals(book.getName(), bookRet.getName());
+
+
+        // then, we need to define a Specification for Book and declare its query conditions -- in this case, we query via book name
+        Specification<Book> spec = new Specification<Book>() {
+            @Override
+            public Predicate toPredicate(Root<Book> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+                // we wanna query based on book name
+                // here the root is an encapsulation of Book
+                return criteriaBuilder.equal(root.get("name"), bookName);
+            }
+        };
+
+
+        // then we pass the spec to the bookRepository
+        Book bookRet2 = bookRepository.findOne(spec).get();
+        Assertions.assertNotEquals(null, bookRet2);
+        Assertions.assertEquals(bookName, bookRet2.getName());
+
     }
 }
