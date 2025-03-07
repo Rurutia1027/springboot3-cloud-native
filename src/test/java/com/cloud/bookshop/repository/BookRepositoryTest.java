@@ -3,10 +3,12 @@ package com.cloud.bookshop.repository;
 import com.cloud.bookshop.BaseTest;
 import com.cloud.bookshop.domain.Book;
 import com.cloud.bookshop.domain.Category;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +19,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -29,6 +35,12 @@ public class BookRepositoryTest extends BaseTest {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private PlatformTransactionManager transactionManager;
+
+    @Autowired
+    private EntityManager entityManager;
 
     @Test
     public void testJPAFind() {
@@ -190,5 +202,78 @@ public class BookRepositoryTest extends BaseTest {
         Assertions.assertTrue(queryBooks.size() > 0);
         Assertions.assertEquals(queryBooks.get(0).getName(), bookName);
         Assertions.assertEquals(queryBooks.get(0).getCategory().getName(), categoryName);
+    }
+
+
+    // we use transaction commit to commit update to dataabse
+    @Test
+    public void testPersistenceContext() {
+        TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
+        Book book = new Book();
+        String bookName = UUID.randomUUID().toString();
+        book.setName(bookName);
+        Book bookRet = bookRepository.save(book);
+
+        Book bookQuery = bookRepository.findByName(bookName).get(0);
+        Assertions.assertEquals(bookQuery.getName(), bookName);
+
+
+        // update queried book's fields -- this will result in JPA's persistence context cached value diff from database table's record
+        // when transaction executes commit, we will see a update SQL command in log info -- this is called dirty check
+        bookQuery.setCreateTime(new Date());
+        // update the create-time will be executed by the transaction commit
+        // bookRepository.save(bookQuery);
+
+        // here in the process of commit, JPA will check whether the persistence context cached entities status
+        // are synchronized with the entities that stored in the database , if there are some distinctions
+        // commit will update the persistence context cached latest entities value to database
+        transactionManager.commit(status);
+        Assertions.assertEquals(bookRet.getName(), bookName);
+    }
+
+    // test case show the difference between save & saveAndFlush
+    // take JPA's persistence context into consideration.
+    // we use @Transactional instead of executing TransactionManager#commit explicitly
+    @Test
+    @Transactional
+    public void testSaveVsSaveAndFlush() {
+        Book book = new Book();
+        String bookName = UUID.randomUUID().toString();
+        book.setName(bookName);
+
+        Book bookRet = bookRepository.save(book);
+        Assertions.assertNotNull(bookRet);
+        Assertions.assertEquals(bookRet.getName(), bookName);
+        Assertions.assertNotNull(bookRet.getId());
+
+
+        Book bookSaveWithoutFlush = new Book();
+        String bookNameWithoutFlush = UUID.randomUUID().toString();
+        bookSaveWithoutFlush.setId(bookRet.getId());
+        bookSaveWithoutFlush.setName(bookNameWithoutFlush);
+
+
+        Book bookSaveWithFlush = new Book();
+        String bookNameWithFlush = UUID.randomUUID().toString();
+        bookSaveWithFlush.setId(bookRet.getId());
+        bookSaveWithFlush.setName(bookNameWithFlush);
+
+        // entity -> persistence context cache -> db disk
+        bookRepository.saveAndFlush(bookSaveWithFlush);
+
+        // entity -> persistence context cache
+        bookRepository.save(bookSaveWithoutFlush);
+
+        // clear JPA persistence context
+        entityManager.clear();
+
+
+        // exeucte query by Id here
+        Book finalRet = bookRepository.findById(bookRet.getId()).get();
+        Assertions.assertNotNull(finalRet);
+        Assertions.assertNotNull(finalRet.getId());
+        Assertions.assertEquals(bookNameWithFlush, finalRet.getName());
+
+
     }
 }
