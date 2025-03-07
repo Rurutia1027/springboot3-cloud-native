@@ -78,4 +78,32 @@ public class BookRepositoryTest extends BaseTest {
         Assertions.assertTrue(books.size() > 0);
         Assertions.assertTrue(books.get(0).getName().equals(bookName));
     }
+
+    @Test
+    public void testExampleMatcherWithString() {
+        String bookName = UUID.randomUUID().toString();
+        Book book = new Book();
+        book.setName(bookName);
+
+        // save book to db
+        Book bookRet = bookRepository.save(book);
+        Assertions.assertTrue(bookRet.getId() > 0);
+
+        // create example matcher and configure it's matching strategy
+        ExampleMatcher matcher = ExampleMatcher.matching()
+                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
+
+        // extract book name fraction here to verify the string matcher's CONTAINING options works as expected
+        String bookNameFraction = bookName.substring(0, bookName.length() - 4);
+        Example<Book> expBook = Example.of(book, matcher);
+
+        // adopt example matcher to book repository via example matcher and pageable configured query condition
+        Pageable pageable = PageRequest.of(0, 3, Sort.by(new Sort.Order(Sort.Direction.DESC, "name")));
+        Page<Book> bookPage = bookRepository.findAll(expBook, pageable);
+        Assertions.assertTrue(bookPage.getTotalPages() > 0);
+        Assertions.assertTrue(bookPage.hasContent());
+        Assertions.assertTrue(bookPage.getContent().size() > 0);
+        Book queryBookItem = bookPage.getContent().get(0);
+        Assertions.assertEquals(queryBookItem.getName(), bookName);
+    }
 }
