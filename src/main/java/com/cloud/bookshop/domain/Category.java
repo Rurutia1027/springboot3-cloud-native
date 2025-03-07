@@ -4,7 +4,9 @@ import jakarta.persistence.Basic;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -12,6 +14,8 @@ import java.util.List;
 // Category:Book = 1:N
 @Entity
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Category extends DomainImpl {
     @Basic
     private String name;
