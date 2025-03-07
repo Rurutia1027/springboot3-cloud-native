@@ -178,7 +178,7 @@ public class BookRepositoryTest extends BaseTest {
                 // condition 2
                 Predicate p2 = criteriaBuilder.equal(root.get("category"), category);
 
-                // join the condition together via AND
+                // combine the two conditions together via AND
                 Predicate p3 = criteriaBuilder.and(p1, p2);
 
                 return p3;
