@@ -11,7 +11,7 @@
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 
-@ManyToOne(fetch = FetchType.EAGER
+@ManyToOne(fetch = FetchType.EAGER)
 ```
 
 ### FetchType.LAZY

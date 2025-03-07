@@ -3,6 +3,8 @@ package com.cloud.bookshop.repository;
 import com.cloud.bookshop.BaseTest;
 import com.cloud.bookshop.domain.Book;
 import com.cloud.bookshop.domain.Category;
+import com.cloud.bookshop.domain.EBook;
+import com.cloud.bookshop.domain.PrintBook;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -309,5 +311,29 @@ public class BookRepositoryTest extends BaseTest {
 
         Assertions.assertNotNull(bookQueryRet1.getCategory());
         Assertions.assertNotNull(bookQueryRet1.getCategory().getName());
+    }
+
+
+    @Test
+    public void testInheritanceEntityRelationship() {
+        EBook b1 = new EBook();
+        String bName1 = UUID.randomUUID().toString();
+
+        PrintBook b2 = new PrintBook();
+        String bName2 = UUID.randomUUID().toString();
+
+        // After we create Book's two sub-classes and JPA will not create extra tables in db
+        // instead it will add sub-classes' new fields to the book table
+        // but there is an extra field that with the name of dtype
+        // then if we insert EBook dtype = EBook, and PrintBook for dtype = PrintBook
+        bookRepository.saveAndFlush(b1);
+        bookRepository.saveAndFlush(b2);
+
+        // here we query all books from database and get each dtype and print
+        List<Book> books = bookRepository.findAll();
+        Assertions.assertTrue(Objects.nonNull(books) && books.size() > 0);
+        books.stream().forEach(item -> {
+            System.out.println("output item is " + item);
+        });
     }
 }
