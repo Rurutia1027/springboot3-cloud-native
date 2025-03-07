@@ -1,18 +1,21 @@
 package com.cloud.bookshop.domain;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedAttributeNode;
 import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.OneToMany;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 // Category:Book = 1:N
 @Entity
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @NamedEntityGraph(name = "Book.fetch.category.and.authors",
         attributeNodes = {@NamedAttributeNode("category"), @NamedAttributeNode("authors")})
 public class Book extends DomainImpl {
@@ -24,7 +27,7 @@ public class Book extends DomainImpl {
     // fetch category only when user invoke it get function
     // @ManyToOne(fetch = FetchType.LAZY)
     // optional = true, this means we must specify Category of one Book
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     private Category category;
 
     @OneToMany(mappedBy = "book")
