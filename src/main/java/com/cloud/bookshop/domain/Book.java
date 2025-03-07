@@ -5,6 +5,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedAttributeNode;
 import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -32,4 +33,7 @@ public class Book extends DomainImpl {
 
     @OneToMany(mappedBy = "book")
     private List<BookAuthor> authors;
+
+    @Version
+    private int version;
 }
