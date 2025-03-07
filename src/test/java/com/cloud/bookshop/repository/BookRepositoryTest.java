@@ -6,12 +6,14 @@ import com.cloud.bookshop.domain.Category;
 import com.cloud.bookshop.domain.EBook;
 import com.cloud.bookshop.domain.PrintBook;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.OptimisticLockException;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -30,6 +32,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
 public class BookRepositoryTest extends BaseTest {
     @Autowired
     private BookRepository bookRepository;
@@ -45,6 +49,29 @@ public class BookRepositoryTest extends BaseTest {
 
     @Autowired
     private PrintBookRepository printBookRepository;
+
+    @Test
+    public void testOptimisticLockingViaVersionAnnotationSolution() {
+        Book book = new Book();
+        String bName = UUID.randomUUID().toString();
+        Book bookRet = bookRepository.saveAndFlush(book);
+        Assertions.assertNotNull(bookRet);
+        Assertions.assertTrue(bookRet.getId() > 0);
+
+        Book bookInTransaction1 = bookRepository.findById(book.getId()).get();
+        bookInTransaction1.setName("UpdatedT1");
+        bookRepository.save(bookInTransaction1);
+
+        Book bookInTransaction2 = bookRepository.findById(book.getId()).get();
+        bookInTransaction2.setName("UpdatedT2");
+
+        try {
+            bookRepository.save(bookInTransaction2);
+        } catch (OptimisticLockException e) {
+            Assertions.assertTrue(e.getMessage().contains("Object of class"));
+        }
+
+    }
 
     @Test
     public void testPrintBookRepository() {
