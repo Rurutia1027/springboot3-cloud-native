@@ -1,5 +1,4 @@
-name: CI/CD Pipeline - MySQL Setup & Build
-
+name: CI/CD Pipeline - BookShop Project 
 on:
   push:
     branches:
@@ -40,7 +39,7 @@ jobs:
           mysql -h 127.0.0.1 -uadmin -padmin -e "SHOW DATABASES;"
 
       - name: Build Project
-        run: mvn clean package -DskipTests
+        run: cd bookshop && mvn clean package -DskipTests
 
       - name: Run Tests
-        run: mvn test
+        run: cd bookshopt && mvn test
