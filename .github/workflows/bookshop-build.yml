@@ -3,9 +3,15 @@ on:
   push:
     branches:
       - master  # Trigger when pushing to master
+    paths:
+      - '.github/workflows/bookshop-build.yml'   
+      - 'bookshop/**'  
   pull_request:
     branches:
       - master  # Trigger when creating a PR to master
+    paths:
+      - '.github/workflows/bookshop-build.yml'   
+      - 'bookshop/**' 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
@@ -42,4 +48,4 @@ jobs:
         run: cd bookshop && mvn clean package -DskipTests
 
       - name: Run Tests
-        run: cd bookshopt && mvn test
+        run: cd bookshop && mvn test
