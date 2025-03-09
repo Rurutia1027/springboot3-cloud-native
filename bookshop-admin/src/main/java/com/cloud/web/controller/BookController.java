@@ -42,6 +42,7 @@ public class BookController {
         return List.of(new BookInfo(), new BookInfo(), new BookInfo());
     }
 
+
     @GetMapping("/{id:\\d}")
     @JsonView(BookInfo.BookDetailView.class)
     public BookInfo getInfo(@PathVariable Long id, @CookieValue String token, @RequestHeader String auth) {
