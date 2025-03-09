@@ -7,10 +7,6 @@ name = "test-coverage"
 enabled = true
 [analyzers.meta]
 java_version = "17"
-
-[[analyzers.tools]]
-name = "java"
-enabled = true
 report_paths = [
     "bookshop/target/site/jacoco/jacoco.xml",
     "bookshop-admin/target/site/jacoco/jacoco.xml",
