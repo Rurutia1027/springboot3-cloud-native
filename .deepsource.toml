@@ -1,6 +1,6 @@
 version = 1
 
-test_patterns = ["src/test/java/**/*Test.java"]
+test_patterns = ["**/src/test/java/**/*Test.java"]
 
 [[analyzers]]
 name = "java"
@@ -11,4 +11,8 @@ java_version = "17"
 [[analyzers.tools]]
 name = "test-coverage"
 enabled = true
-report_paths = ["target/site/jacoco/jacoco.xml"]
+report_paths = [
+    "bookshop/target/site/jacoco/jacoco.xml",
+    "bookshop-admin/target/site/jacoco/jacoco.xml",
+    "bookshop-web/target/site/jacoco/jacoco.xml"
+]
