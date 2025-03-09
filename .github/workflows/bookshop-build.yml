@@ -45,7 +45,13 @@ jobs:
           mysql -h 127.0.0.1 -uadmin -padmin -e "SHOW DATABASES;"
 
       - name: Install DeepSource CLI
-        run: curl https://deepsource.io/cli | sh && echo "$PWD/bin" >> $GITHUB_PATH
+        run: curl https://deepsource.io/cli | sh
+
+      - name: Add DeepSource to PATH
+        run: echo "$PWD/bin" >> $GITHUB_PATH
+
+      - name: Verify DeepSource installation
+        run: which deepsource && deepsource --help
 
       - name: Build Project
         run: cd bookshop && mvn clean package -DskipTests

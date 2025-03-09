@@ -27,12 +27,6 @@ jobs:
           java-version: "17"
           cache: maven
 
-      # - name: Build Project
-      #   run: cd bookshop-admin && mvn clean package -DskipTests
-
-      # - name: Run Tests with JaCoCo
-      #   run: cd bookshop-admin && mvn test jacoco:report
-
       - name: Install DeepSource CLI
         run: curl https://deepsource.io/cli | sh
 
@@ -42,8 +36,14 @@ jobs:
       - name: Verify DeepSource installation
         run: which deepsource && deepsource --help
 
-      # - name: Upload Test Coverage to DeepSource
-      #   run: cd bookshop-admin && deepsource report --analyzer java --key test-coverage --value-file target/site/jacoco/jacoco.xml
+      - name: Build Project
+        run: cd bookshop-admin && mvn clean package -DskipTests
 
-      # - name: Notify DeepSource
-      #   run: deepsource notify --analyzer java
+      - name: Run Tests with JaCoCo
+        run: cd bookshop-admin && mvn test jacoco:report
+
+      - name: Upload Test Coverage to DeepSource
+        run: cd bookshop-admin && deepsource report --analyzer java --key test-coverage --value-file target/site/jacoco/jacoco.xml
+
+      - name: Notify DeepSource
+        run: deepsource notify --analyzer java
