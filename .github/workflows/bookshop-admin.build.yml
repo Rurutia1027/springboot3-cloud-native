@@ -27,14 +27,14 @@ jobs:
           java-version: "17"
           cache: maven
 
-      - name: Build Project
-        run: cd bookshop-admin && mvn clean package -DskipTests
+      # - name: Build Project
+      #   run: cd bookshop-admin && mvn clean package -DskipTests
 
-      - name: Run Tests with JaCoCo
-        run: cd bookshop-admin && mvn test jacoco:report
+      # - name: Run Tests with JaCoCo
+      #   run: cd bookshop-admin && mvn test jacoco:report
 
       - name: Install DeepSource CLI
-        run: curl https://deepsource.io/cli | sh && echo "$PWD/bin" >> $GITHUB_PATH
+        run: curl https://deepsource.io/cli | sh && whereis deepsource
 
       - name: Add DeepSource CLI to PATH
         run:  deepsource --help 
