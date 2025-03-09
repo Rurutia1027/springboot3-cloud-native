@@ -1,9 +1,5 @@
 name: CI/CD Pipeline - BookShop Project 
 on:
-  workflow_run:
-    workflows: ["CI/CD Pipeline - BookShop Project"] # Monitor/Pending on BookShop Project CI/CD Pipeline Finish
-    types:
-      - completed
   push:
     branches:
       - master  # Trigger when pushing to master
