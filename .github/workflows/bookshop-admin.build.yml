@@ -34,13 +34,16 @@ jobs:
       #   run: cd bookshop-admin && mvn test jacoco:report
 
       - name: Install DeepSource CLI
-        run: curl https://deepsource.io/cli | sh && whereis deepsource
+        run: curl https://deepsource.io/cli | sh
 
-      - name: Add DeepSource CLI to PATH
-        run:  deepsource --help 
+      - name: Add DeepSource to PATH
+        run: echo "$PWD/bin" >> $GITHUB_PATH
 
-      - name: Upload Test Coverage to DeepSource
-        run: cd bookshop-admin && deepsource report --analyzer java --key test-coverage --value-file target/site/jacoco/jacoco.xml
+      - name: Verify DeepSource installation
+        run: which deepsource && deepsource --help
 
-      - name: Notify DeepSource
-        run: deepsource notify --analyzer java
+      # - name: Upload Test Coverage to DeepSource
+      #   run: cd bookshop-admin && deepsource report --analyzer java --key test-coverage --value-file target/site/jacoco/jacoco.xml
+
+      # - name: Notify DeepSource
+      #   run: deepsource notify --analyzer java
