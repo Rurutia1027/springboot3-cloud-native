@@ -1,9 +1,12 @@
 package com.cloud.dto;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -25,6 +28,10 @@ public class BookInfo {
     @JsonView(BookListView.class)
     private String name;
 
+    @NotBlank
     @JsonView(BookDetailView.class)
     private String content;
+
+    @JsonView(BookListView.class)
+    private Date publishDate;
 }
