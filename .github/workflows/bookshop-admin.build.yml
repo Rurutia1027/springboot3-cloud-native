@@ -40,20 +40,10 @@ jobs:
         run: cd bookshop-admin && mvn clean package -DskipTests
 
       - name: Run Tests with JaCoCo
-        run: cd bookshop-admin && mvn test jacoco:report
-
-      - name: Debug DSN 
-        env: 
-          DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN}}
-        run: 
-          echo "using DSN" ${DEEPSOURCE_DSN}
+        run: cd bookshop-admin && mvn test jacoco:report && ls target/site/jacoco/jacoco.xml
 
       - name: Upload Test Coverage to DeepSource
         env:
           DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
         run: cd bookshop-admin && deepsource report --analyzer test-coverage --key java --value-file target/site/jacoco/jacoco.xml
 
-      - name: Notify DeepSource
-        env:
-          DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
-        run: deepsource notify --analyzer java
