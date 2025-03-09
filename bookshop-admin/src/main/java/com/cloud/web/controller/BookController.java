@@ -5,6 +5,7 @@ import com.cloud.dto.BookCondition;
 import com.cloud.dto.BookInfo;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,5 +28,17 @@ public class BookController {
         // get sort info
         System.out.println(pageable.getSort());
         return List.of(new BookInfo(), new BookInfo(), new BookInfo());
+    }
+
+
+    @RequestMapping(value = "/book/{id}", method = RequestMethod.GET)
+    public BookInfo getInfo(@PathVariable Long id) {
+        System.out.println("recv variable id is " + id);
+
+        // create an instance here
+        BookInfo bookInfo = new BookInfo();
+        bookInfo.setName("mock_book_name");
+        bookInfo.setId(233L);
+        return bookInfo;
     }
 }
