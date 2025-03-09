@@ -47,5 +47,18 @@ jobs:
       - name: Build Project
         run: cd bookshop && mvn clean package -DskipTests
 
-      - name: Run Tests
-        run: cd bookshop && mvn test
+      
+      - name: Run Tests with JaCoCo
+        run: cd bookshop && mvn test jacoco:report
+
+      - name: Add DeepSource CLI to PATH
+        run: echo "$PWD/bin" >> $GITHUB_PATH  # Add to system PATH
+
+      - name: Verify DeepSource CLI Installation
+        run: deepsource --version  # Ensure it's installed properly
+
+      - name: Upload Test Coverage to DeepSource
+        run: cd bookshop && deepsource report --analyzer java --key test-coverage --value-file target/site/jacoco/jacoco.xml
+
+      - name: Notify DeepSource
+        run: deepsource notify --analyzer java
