@@ -37,7 +37,7 @@ jobs:
         run: curl https://deepsource.io/cli | sh
 
       - name: Add DeepSource CLI to PATH
-        run: echo "$PWD/bin" >> $GITHUB_PATH # Add to system PATH
+        run:  ./bin/deepsource --help 
 
       - name: Verify DeepSource CLI Installation
         run: which deepsource && whereis deepsource  
