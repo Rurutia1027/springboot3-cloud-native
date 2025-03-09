@@ -37,7 +37,7 @@ public class FileController {
 
     @GetMapping("/download")
     public void download(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        String filePath = "/Users/emma/Ireland-Job/Spring-Dubbo-Distributed-REST-Service-Development-Practice/bookshop-admin/src/main/java/com/cloud/dto/BookCondition.java";
+        String filePath = "Spring-Dubbo-Distributed-REST-Service-Development-Practice/bookshop-admin/src/main/java/com/cloud/dto/BookCondition.java";
         try (InputStream inputStream = new FileInputStream(filePath);
              OutputStream outputStream = response.getOutputStream()) {
             response.setContentType("application/x-download");
