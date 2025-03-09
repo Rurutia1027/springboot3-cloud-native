@@ -44,15 +44,6 @@ jobs:
           sudo apt-get install -y mysql-client
           mysql -h 127.0.0.1 -uadmin -padmin -e "SHOW DATABASES;"
 
-      - name: Install DeepSource CLI
-        run: curl https://deepsource.io/cli | sh
-
-      - name: Add DeepSource to PATH
-        run: echo "$PWD/bin" >> $GITHUB_PATH
-
-      - name: Verify DeepSource installation
-        run: which deepsource && deepsource --help
-
       - name: Build Project
         run: cd bookshop && mvn clean package -DskipTests
       
@@ -60,9 +51,9 @@ jobs:
         run: |
           cd bookshop && mvn test jacoco:report
           ls target/site/jacoco/jacoco.xml 
-
+      
       - name: Upload Test Coverage to DeepSource
-        env:
-          DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
-        run: cd bookshop && deepsource report --analyzer test-coverage --key java --value-file target/site/jacoco/jacoco.xml
+        run: |
+          curl https://deepsource.com/cli | sh
+          ./bin/deepsource report --analyzer test-coverage --key java --value-file --value-file bookshop/target/site/jacoco/jacoco.xml
 

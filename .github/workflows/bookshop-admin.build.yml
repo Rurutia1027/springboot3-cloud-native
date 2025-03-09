@@ -27,23 +27,14 @@ jobs:
           java-version: "17"
           cache: maven
 
-      - name: Install DeepSource CLI
-        run: curl https://deepsource.io/cli | sh
-
-      - name: Add DeepSource to PATH
-        run: echo "$PWD/bin" >> $GITHUB_PATH
-
-      - name: Verify DeepSource installation
-        run: which deepsource && deepsource --help
-
       - name: Build Project
         run: cd bookshop-admin && mvn clean package -DskipTests
 
       - name: Run Tests with JaCoCo
-        run: cd bookshop-admin && mvn test jacoco:report && ls target/site/jacoco/jacoco.xml
+        run: cd bookshop-admin && mvn test jacoco:report
 
       - name: Upload Test Coverage to DeepSource
-        env:
-          DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
-        run: cd bookshop-admin && deepsource report --analyzer test-coverage --key java --value-file target/site/jacoco/jacoco.xml
+        run: |
+          curl https://deepsource.com/cli | sh
+          ./bin/deepsource report --analyzer test-coverage --key java --value-file bookshop-admin/target/site/jacoco/jacoco.xml
 
