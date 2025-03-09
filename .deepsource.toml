@@ -1,0 +1,14 @@
+version = 1
+
+test_patterns = ["src/test/java/**/*Test.java"]
+
+[[analyzers]]
+name = "java"
+enabled = true
+[analyzers.meta]
+java_version = "17"
+
+[[analyzers.tools]]
+name = "test-coverage"
+enabled = true
+report_paths = ["target/site/jacoco/jacoco.xml"]
