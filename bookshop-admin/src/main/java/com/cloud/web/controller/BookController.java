@@ -4,13 +4,17 @@ package com.cloud.web.controller;
 import com.cloud.dto.BookCondition;
 import com.cloud.dto.BookInfo;
 import com.fasterxml.jackson.annotation.JsonView;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -42,6 +46,14 @@ public class BookController {
         BookInfo bookInfo = new BookInfo();
         bookInfo.setName("mock_book_name");
         bookInfo.setId(233L);
+        bookInfo.setPublishDate(new Date());
         return bookInfo;
+    }
+
+    @PostMapping
+    public BookInfo create(@Valid @RequestBody BookInfo info) {
+        System.out.println("recv info :" + info.toString());
+        info.setId(1L);
+        return info;
     }
 }
