@@ -33,12 +33,13 @@ jobs:
       - name: Run Tests with JaCoCo
         run: cd bookshop-admin && mvn test jacoco:report
 
-      - name: Upload JaCoCo Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: jacoco-report
-          path: target/site/jacoco
-      - name: Run DeepSource Analysis
-        env:
-          DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN}}
+      - name: Install DeepSource CLI
+        run: |
+          curl https://deepsource.io/cli | sh
+          echo "$HOME/.deepsource/bin" >> $GITHUB_PATH
+
+      - name: Upload Test Coverage to DeepSource
         run: deepsource report --analyzer java --key test-coverage --value-file target/site/jacoco/jacoco.xml
+
+      - name: Notify DeepSource
+        run: deepsource notify --analyzer java
