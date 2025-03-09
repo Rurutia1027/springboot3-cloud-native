@@ -34,6 +34,8 @@ jobs:
         run: cd bookshop-admin && mvn test jacoco:report
 
       - name: Upload Test Coverage to DeepSource
+        env: 
+          DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
         run: |
           curl https://deepsource.com/cli | sh
           ./bin/deepsource report --analyzer test-coverage --key java --value-file bookshop-admin/target/site/jacoco/jacoco.xml
