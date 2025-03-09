@@ -8,10 +8,14 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -40,8 +44,10 @@ public class BookController {
 
     @GetMapping("/{id:\\d}")
     @JsonView(BookInfo.BookDetailView.class)
-    public BookInfo getInfo(@PathVariable Long id) {
+    public BookInfo getInfo(@PathVariable Long id, @CookieValue String token, @RequestHeader String auth) {
         System.out.println("recv variable id is " + id);
+        System.out.println("recv token value is " + token);
+        System.out.println("recv header auth value is " + auth);
 
         // create an instance here
         BookInfo bookInfo = new BookInfo();
@@ -66,4 +72,24 @@ public class BookController {
         info.setId(1L);
         return info;
     }
+
+    @PutMapping("/{id}")
+    public BookInfo update(@Valid @RequestBody BookInfo info, BindingResult result) {
+        if (result.hasErrors()) {
+            result.getAllErrors()
+                    .stream().forEach(item -> {
+                        System.out.println(item.getDefaultMessage());
+                    });
+        }
+
+        System.out.println("recv info :" + info.toString());
+        info.setId(1L);
+        return info;
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        System.out.println("gonna delete id " + id);
+    }
+
 }
