@@ -23,7 +23,7 @@ class BookControllerTest {
                         .param("categoryId", "100")
                         .param("page", "1")
                         .param("size", "3")
-                        .param("sort", "name,desc")
+                        .param("sort", "name,desc", "createdTime,asc")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(3));
