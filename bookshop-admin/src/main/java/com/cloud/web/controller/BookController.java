@@ -3,18 +3,21 @@ package com.cloud.web.controller;
 
 import com.cloud.dto.BookCondition;
 import com.cloud.dto.BookInfo;
+import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
+@RequestMapping("/book")
 public class BookController {
-    @RequestMapping(value = "/book", method = RequestMethod.GET)
+    @GetMapping
+    @JsonView(BookInfo.BookListView.class)
     public List<BookInfo> query(BookCondition condition, @PageableDefault(size = 10) Pageable pageable) {
         System.out.println("condition name " + condition.getName());
         System.out.println("condition categoryId " + condition.getCategoryId());
@@ -30,8 +33,8 @@ public class BookController {
         return List.of(new BookInfo(), new BookInfo(), new BookInfo());
     }
 
-
-    @RequestMapping(value = "/book/{id}", method = RequestMethod.GET)
+    @GetMapping("/{id:\\d}")
+    @JsonView(BookInfo.BookDetailView.class)
     public BookInfo getInfo(@PathVariable Long id) {
         System.out.println("recv variable id is " + id);
 
