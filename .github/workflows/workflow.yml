@@ -61,7 +61,7 @@ jobs:
       - name: Run Tests with JaCoCo
         run: |
           cd bookshop && mvn test jacoco:report
-          ls bookshop/target/site/jacoco/jacoco.xml
+          ls target/site/jacoco/jacoco.xml
 
       - name: Upload BookShop Test Coverage to DeepSource
         env:
@@ -102,7 +102,7 @@ jobs:
       - name: Run Tests with JaCoCo
         run: |
           cd bookshop-admin && mvn test jacoco:report
-          ls bookshop-admin/target/site/jacoco/jacoco.xml
+          ls target/site/jacoco/jacoco.xml
 
       - name: Upload Bookshop-Admin Test Coverage to DeepSource
         env:
