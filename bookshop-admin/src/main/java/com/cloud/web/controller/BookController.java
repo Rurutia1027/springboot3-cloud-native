@@ -4,6 +4,10 @@ package com.cloud.web.controller;
 import com.cloud.dto.BookCondition;
 import com.cloud.dto.BookInfo;
 import com.fasterxml.jackson.annotation.JsonView;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -27,7 +31,12 @@ import java.util.List;
 public class BookController {
     @GetMapping
     @JsonView(BookInfo.BookListView.class)
-    public List<BookInfo> query(BookCondition condition, @PageableDefault(size = 10) Pageable pageable) {
+    @Operation(summary = "Get greeting message", description = "This API returns a greeting message")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved greeting message"),
+            @ApiResponse(responseCode = "400", description = "Bad Request")
+    })
+    public List<BookInfo> query(@Parameter(description = "Query BookCondition of the Controller", required = true) BookCondition condition, @PageableDefault(size = 10) Pageable pageable) {
         System.out.println("condition name " + condition.getName());
         System.out.println("condition categoryId " + condition.getCategoryId());
 

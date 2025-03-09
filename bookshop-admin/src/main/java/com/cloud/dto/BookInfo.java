@@ -1,6 +1,7 @@
 package com.cloud.dto;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,6 +27,7 @@ public class BookInfo {
     private Long id;
 
     @JsonView(BookListView.class)
+    @Schema(description = "name of the BookInfo")
     private String name;
 
     @NotBlank
