@@ -21,6 +21,9 @@ class BookControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/book")
                         .param("name", "a and b")
                         .param("categoryId", "100")
+                        .param("page", "1")
+                        .param("size", "3")
+                        .param("sort", "name,desc")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(3));
