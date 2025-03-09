@@ -4,13 +4,13 @@ on:
     branches:
       - master # Trigger when pushing to master
     paths:
-      - ".github/workflows/bookshop-admin-build.yml"
+      - ".github/workflows/bookshop-admin.build.yml"
       - "bookshop-admin/**"
   pull_request:
     branches:
       - master # Trigger when creating a PR to master
     paths:
-      - ".github/workflows/bookshop-admin-build.yml"
+      - ".github/workflows/bookshop-admin.build.yml"
       - "bookshop-admin/**"
 jobs:
   build-and-test:
