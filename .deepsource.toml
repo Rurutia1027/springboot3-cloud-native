@@ -3,13 +3,13 @@ version = 1
 test_patterns = ["**/src/test/java/**/*Test.java"]
 
 [[analyzers]]
-name = "java"
+name = "test-coverage"
 enabled = true
 [analyzers.meta]
 java_version = "17"
 
 [[analyzers.tools]]
-name = "test-coverage"
+name = "java"
 enabled = true
 report_paths = [
     "bookshop/target/site/jacoco/jacoco.xml",
