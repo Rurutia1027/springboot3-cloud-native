@@ -45,7 +45,7 @@ jobs:
           mysql -h 127.0.0.1 -uadmin -padmin -e "SHOW DATABASES;"
 
       - name: Build Project
-        run: cd bookshop && mvn clean package -DskipTests
+        run: cd bookshop && mvn clean install -DskipTests
       
       - name: Run Tests with JaCoCo
         run: |
