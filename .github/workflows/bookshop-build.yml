@@ -59,11 +59,12 @@ jobs:
       - name: Run Tests with JaCoCo
         run: cd bookshop && mvn test jacoco:report
 
-      - name: Verify DeepSource CLI Installation
-        run: deepsource --version  # Ensure it's installed properly
-
       - name: Upload Test Coverage to DeepSource
+        env:
+          DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
         run: cd bookshop && deepsource report --analyzer java --key test-coverage --value-file target/site/jacoco/jacoco.xml
 
       - name: Notify DeepSource
+        env:
+          DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
         run: deepsource notify --analyzer java
