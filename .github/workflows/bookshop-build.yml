@@ -51,6 +51,9 @@ jobs:
       - name: Run Tests with JaCoCo
         run: cd bookshop && mvn test jacoco:report
 
+      - name: Install DeepSource CLI
+        run: curl https://deepsource.io/cli | sh
+
       - name: Add DeepSource CLI to PATH
         run: echo "$PWD/bin" >> $GITHUB_PATH  # Add to system PATH
 
