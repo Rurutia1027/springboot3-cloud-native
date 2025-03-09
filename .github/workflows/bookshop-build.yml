@@ -9,9 +9,6 @@ on:
   pull_request:
     branches:
       - master  # Trigger when creating a PR to master
-    paths:
-      - '.github/workflows/bookshop-build.yml'   
-      - 'bookshop/**' 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest

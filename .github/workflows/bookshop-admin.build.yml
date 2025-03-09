@@ -13,9 +13,6 @@ on:
   pull_request:
     branches:
       - master # Trigger when creating a PR to master
-    paths:
-      - ".github/workflows/bookshop-admin.build.yml"
-      - "bookshop-admin/**"
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
@@ -31,12 +28,12 @@ jobs:
           java-version: "17"
           cache: maven
       
-      # pending on waiting for BookShop Project CI/CD Pipeline Finish && Success 
-      - name: Wait for BookShop Project Build and Compile Success
-        if: ${{ github.event.workflow_run.conclusion != 'success' }}
-        run: |
-          echo "Previous BookShop Project CI/CD failed or did not complete successfully."
-          exit 1
+      # # pending on waiting for BookShop Project CI/CD Pipeline Finish && Success 
+      # - name: Wait for BookShop Project Build and Compile Success
+      #   if: ${{ github.event.workflow_run.conclusion != 'success' }}
+      #   run: |
+      #     echo "Previous BookShop Project CI/CD failed or did not complete successfully."
+      #     exit 1
 
       - name: Build Project
         run: cd bookshop-admin && mvn clean package -DskipTests
