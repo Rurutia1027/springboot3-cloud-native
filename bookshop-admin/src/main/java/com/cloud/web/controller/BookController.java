@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -50,8 +51,17 @@ public class BookController {
         return bookInfo;
     }
 
+    // BindingResult contains all the validate operations final results
+    // if any invalid checking detects those invalid results will be sync to result:BindingResult
     @PostMapping
-    public BookInfo create(@Valid @RequestBody BookInfo info) {
+    public BookInfo create(@Valid @RequestBody BookInfo info, BindingResult result) {
+        if (result.hasErrors()) {
+            result.getAllErrors()
+                    .stream().forEach(item -> {
+                        System.out.println(item.getDefaultMessage());
+                    });
+        }
+
         System.out.println("recv info :" + info.toString());
         info.setId(1L);
         return info;
