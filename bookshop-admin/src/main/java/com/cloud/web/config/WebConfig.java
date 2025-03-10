@@ -23,8 +23,8 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(timeInterceptor)
-                .addPathPatterns("/**") // Intercept all paths
-                .excludePathPatterns("/static/**", "/css/**", "/js/**"); // Exclude static resources
+                .addPathPatterns("/**")
+                .excludePathPatterns("/static/**", "/css/**", "/js/**", "/admin/**");
     }
 
     @Bean
