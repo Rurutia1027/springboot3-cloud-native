@@ -22,17 +22,19 @@ public class SecurityConfig {
                         auth
                                 // all request query /book endpoint are allowed
                                 .requestMatchers("/book").permitAll()
+                                .requestMatchers("/book/**").authenticated()
                                 // other url address should be authenticated
                                 .anyRequest().authenticated())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .formLogin();
+
         return http.build();
     }
 
     @Bean
     public UserDetailsService userDetailsService() {
         UserDetails user = User.withUsername("admin")
-                .password(passwordEncoder().encode("admin123"))
+                .password(passwordEncoder().encode("admin"))
                 .roles("ADMIN")
                 .build();
         return new InMemoryUserDetailsManager(user);

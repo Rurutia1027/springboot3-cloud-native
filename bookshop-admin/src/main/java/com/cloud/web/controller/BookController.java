@@ -11,6 +11,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,6 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/book")
@@ -37,6 +41,16 @@ public class BookController {
             @ApiResponse(responseCode = "400", description = "Bad Request")
     })
     public List<BookInfo> query(@Parameter(description = "Query BookCondition of the Controller", required = true) BookCondition condition, @PageableDefault(size = 10) Pageable pageable) {
+
+        // get SpringContext and then get Authentication
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("Authentication " + authentication);
+
+        if (Objects.nonNull(authentication)) {
+            System.out.println("Authentication#principal " + authentication.getPrincipal());
+        }
+
+
         System.out.println("condition name " + condition.getName());
         System.out.println("condition categoryId " + condition.getCategoryId());
 
@@ -51,8 +65,26 @@ public class BookController {
         return List.of(new BookInfo(), new BookInfo(), new BookInfo());
     }
 
+    @GetMapping("/item/{id}")
+    @JsonView(BookInfo.BookDetailView.class)
+    public BookInfo getBookInfo(@PathVariable Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("Authentication " + authentication);
 
-    @GetMapping("/{id:\\d}")
+        if (Objects.nonNull(authentication)) {
+            System.out.println("Authentication#principal " + authentication);
+        }
+
+        BookInfo ret = new BookInfo();
+        ret.setName(UUID.randomUUID().toString());
+        ret.setId(2465675L);
+        ret.setPublishDate(new Date());
+        ret.setContent(UUID.randomUUID().toString());
+        return ret;
+    }
+
+
+    @GetMapping("/{id}")
     @JsonView(BookInfo.BookDetailView.class)
     public BookInfo getInfo(@PathVariable Long id, @CookieValue String token, @RequestHeader String auth) {
         System.out.println("recv variable id is " + id);
