@@ -13,7 +13,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
+import javax.sql.DataSource;
 import java.util.List;
 
 @Configuration
@@ -23,6 +26,17 @@ public class SecurityConfig {
     private AuthenticationSuccessHandler bookShopAuthenticaitonSuccessHandler;
     @Autowired
     private AuthenticationFailureHandler bookShopAuthenticationFailureHandler;
+
+    @Autowired
+    private DataSource dataSource;
+
+    @Bean
+    public PersistentTokenRepository persistentTokenRepository() {
+        JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
+        tokenRepository.setCreateTableOnStartup(false);
+        tokenRepository.setDataSource(dataSource);
+        return tokenRepository;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -43,7 +57,11 @@ public class SecurityConfig {
                         .passwordParameter("pass")
                         .successHandler(bookShopAuthenticaitonSuccessHandler)
                         .failureHandler(bookShopAuthenticationFailureHandler)
-                        .permitAll());
+                        .permitAll())
+                .rememberMe()
+                .tokenRepository(persistentTokenRepository())
+                // how long will Remember Me store the token to persistent_logins db table
+                .tokenValiditySeconds(60);
         return http.build();
     }
 
@@ -55,18 +73,6 @@ public class SecurityConfig {
         authProvider.setPasswordEncoder(passwordEncoder());
         return new ProviderManager(List.of(authProvider));
     }
-
-
-//    // define UserDetailsService --
-//    // and this can be replaced to other storage services/framework like redis/database if needed
-//    @Bean
-//    public UserDetailsService userDetailsService() {
-//        UserDetails user = User.withUsername("admin")
-//                .password(passwordEncoder().encode("admin"))
-//                .roles("ADMIN")
-//                .build();
-//        return new InMemoryUserDetailsManager(user);
-//    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
