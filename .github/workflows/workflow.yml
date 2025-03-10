@@ -68,7 +68,7 @@ jobs:
           DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
         run: |
           curl https://deepsource.com/cli | sh
-          ./bin/deepsource report --analyzer java
+          ./bin/deepsource analyze
 
   bookshop-admin:
     runs-on: ubuntu-latest
@@ -109,4 +109,4 @@ jobs:
           DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
         run: |
           curl https://deepsource.com/cli | sh
-          ./bin/deepsource report --analyzer java
+          ./bin/deepsource analyze
