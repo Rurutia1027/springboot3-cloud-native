@@ -68,7 +68,8 @@ jobs:
           DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
         run: |
           curl https://deepsource.com/cli | sh
-          ./bin/deepsource analyze
+          pwd && ls bookshop/target/site/jacoco/jacoco.xml
+          ./bin/deepsource report --analyzer test-coverage --key java --value-file bookshop/target/site/jacoco/jacoco.xml
 
   bookshop-admin:
     runs-on: ubuntu-latest
@@ -109,4 +110,5 @@ jobs:
           DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
         run: |
           curl https://deepsource.com/cli | sh
-          ./bin/deepsource analyze
+          pwd && ls bookshop/target/site/jacoco/jacoco.xml
+          ./bin/deepsource report --analyzer test-coverage --key java --value-file bookshop/target/site/jacoco/jacoco.xml
