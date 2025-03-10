@@ -19,8 +19,8 @@ public class TimeInterceptor implements HandlerInterceptor {
 
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-        System.out.println("#postHandle");
-        System.out.println("server processing time consume: " + (new Date().getTime() - (Long) request.getAttribute("startTime")) + " ms");
+//        System.out.println("#postHandle");
+//        System.out.println("server processing time consume: " + (new Date().getTime() - (Long) request.getAttribute("startTime")) + " ms");
     }
 
     @Override
