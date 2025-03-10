@@ -1,12 +1,13 @@
 package com.cloud.bookshop;
 
-import com.cloud.bookshop.support.BookShopRepositoryImpl;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@EnableJpaRepositories(repositoryBaseClass = BookShopRepositoryImpl.class)
+@EnableJpaRepositories(basePackages = "com.cloud.bookshop.repository")
+@EntityScan(basePackages = "com.cloud.bookshop.domain")
 public class BookstoreBackendApplication {
 
     public static void main(String[] args) {
