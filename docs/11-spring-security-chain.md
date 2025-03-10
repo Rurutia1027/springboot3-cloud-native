@@ -4,6 +4,8 @@
 
 ![](./spring-security-chain.png)
 
+![](./authentication.png)
+
 
 - The image illustrates the **Spring Security filter chain** used to secure REST APIs.
 - Requests go through as series of security filters before reaching the REST API.
@@ -37,4 +39,5 @@
 
 ## Key Concept 
 - Spring Security Filter Chain acts as a middleware to handle security concerns before processing REST API requests. 
+ 
 
