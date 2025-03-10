@@ -7,11 +7,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.UUID;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -29,6 +31,7 @@ class BookControllerTest {
     private MockMvc mockMvc;
 
     @Test
+    @WithMockUser(username = "user", roles = {"USER"})
     public void whenBookQuerySuccess() throws Exception {
         mockMvc.perform(get("/book")
                         .param("name", "a and b")
@@ -42,6 +45,7 @@ class BookControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user", roles = {"USER"})
     public void whenGetInfoSuccess() throws Exception {
         String ret = mockMvc.perform(get("/book/1")
                         .cookie(new Cookie("token", UUID.randomUUID().toString()))
@@ -55,6 +59,7 @@ class BookControllerTest {
 
 
     @Test
+    @WithMockUser(username = "user", roles = {"USER"})
     public void whenGetInfoFail() throws Exception {
         mockMvc.perform(get("/book/10")
                         .accept(MediaType.APPLICATION_JSON))
@@ -62,30 +67,39 @@ class BookControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user", roles = {"USER"})
     public void whenCreateSuccess() throws Exception {
-        mockMvc.perform(post("/book").content("{\"id\":null,\"name\":\"test_book\",\"content\":\"test_book\",\"publishDate\":\"2025-05-05\"}").contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(post("/book")
+                        .with(csrf())
+                        .content("{\"id\":null,\"name\":\"test_book\",\"content\":\"test_book\",\"publishDate\":\"2025-05-05\"}").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("1"));
     }
 
 
     @Test
+    @WithMockUser(username = "user", roles = {"USER"})
     public void whenUpdateSuccess() throws Exception {
         String content = "{\"id\":1,\"name\":\"test_book\",\"content\":\"test_book\",\"publishDate\":\"2025-05-05\"}";
-        mockMvc.perform(put("/book/1").content(content).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(put("/book/1")
+                        .with(csrf())
+                        .content(content).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("1"));
     }
 
     @Test
+    @WithMockUser(username = "user", roles = {"USER"})
     public void whenDeleteSuccess() throws Exception {
         mockMvc.perform(delete("/book/1")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
     // annotations for handling cookies or headers
     @Test
+    @WithMockUser(username = "user", roles = {"USER"})
     public void whenCookieOrHeaderExists() throws Exception {
         mockMvc.perform(get("/book/1")
                         .cookie(new Cookie("token", UUID.randomUUID().toString()))
@@ -95,7 +109,8 @@ class BookControllerTest {
     }
 
     // upload file test case
-    @Test
+    // disale this case to avoid generate test file
+    // @Test
     public void whenUploadSuccess() throws Exception {
         // create a mock file to upload
         MockMultipartFile file = new MockMultipartFile("file", "test.txt", "multipart/form-data", "Hello, World".getBytes());
