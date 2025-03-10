@@ -64,6 +64,11 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
+      - name: Verify MySQL Connection
+        run: |
+          sudo apt-get install -y mysql-client
+          mysql -h 127.0.0.1 -uadmin -padmin -e "SHOW DATABASES;"
+
       - name: Build & Install BookShop
         run: |
           cd bookshop
