@@ -2,21 +2,10 @@
 
 **Spring Security** provides a comprehensive set of tools for authentication and authorization in modern Java applications. In **Spring Security 6.x**, there are several key features and improvements that make authorization management more flexible and powerful.
 
-- `GrantedAuthority`
-
-- `AbstractSecurityInterceptor` & Spring AOP 
-
-- `ConfiAttribute` 
-
-- `AccessDecisionManager`
-- `AbstractAccessDecisionManager`
-- `AccessDecisionVoter`
-- `Expression` inner role expression
+## UML Diagram of Spring Security Core Classes 
 
 
-
----- 
-
+![Spring Security UML Diagram](./spring-security-uml.png)
 
 ### Core Concepts 
 - **Authorization** refers to the process of determining whether a user has the correct permissions to access a particular resource. 
