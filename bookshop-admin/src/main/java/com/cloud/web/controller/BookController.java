@@ -1,14 +1,16 @@
 package com.cloud.web.controller;
 
 
-import com.cloud.dto.BookCondition;
-import com.cloud.dto.BookInfo;
+import com.cloud.web.dto.BookCondition;
+import com.cloud.web.dto.BookInfo;
+import com.cloud.web.service.BookService;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.Authentication;
@@ -33,6 +35,9 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/book")
 public class BookController {
+    @Autowired
+    private BookService bookService;
+
     @GetMapping
     @JsonView(BookInfo.BookListView.class)
     @Operation(summary = "Get greeting message", description = "This API returns a greeting message")
@@ -68,6 +73,8 @@ public class BookController {
     @GetMapping("/item/{id}")
     @JsonView(BookInfo.BookDetailView.class)
     public BookInfo getBookInfo(@PathVariable Long id) {
+        bookService.getInfo(id);
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         System.out.println("Authentication " + authentication);
 
