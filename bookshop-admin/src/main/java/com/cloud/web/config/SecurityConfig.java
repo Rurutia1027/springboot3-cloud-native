@@ -58,6 +58,16 @@ public class SecurityConfig {
                         .defaultSuccessUrl("/index.html", false)
                         .failureHandler(bookShopAuthenticationFailureHandler)
                         .permitAll())
+                // session manager
+                .sessionManagement()
+                // when session got expired which url to redirect -> #invalidSessionUrl()
+                .invalidSessionUrl("/session.html")
+                .maximumSessions(1)
+                // When a user reaches the maximum allowed sessions,
+                // any attempt to log in from another device or browser will be denied.
+                .maxSessionsPreventsLogin(true)
+                .and()
+                .and()
                 .rememberMe()
                 .tokenRepository(persistentTokenRepository())
                 // how long will Remember Me store the token to persistent_logins db table
