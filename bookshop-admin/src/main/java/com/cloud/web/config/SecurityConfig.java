@@ -45,7 +45,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         // all request query /book endpoint are allowed
-                        .requestMatchers("/book", "/login.html", "/auth").permitAll()
+                        .requestMatchers("/book", "/login.html", "/auth", "/session.html").permitAll()
                         .requestMatchers("/book/**").authenticated()
                         // other url address should be authenticated
                         .anyRequest().authenticated())
@@ -55,7 +55,7 @@ public class SecurityConfig {
                         .loginProcessingUrl("/auth")
                         .usernameParameter("user")
                         .passwordParameter("pass")
-                        .successHandler(bookShopAuthenticaitonSuccessHandler)
+                        .defaultSuccessUrl("/index.html", false)
                         .failureHandler(bookShopAuthenticationFailureHandler)
                         .permitAll())
                 .rememberMe()
@@ -63,9 +63,10 @@ public class SecurityConfig {
                 // how long will Remember Me store the token to persistent_logins db table
                 .tokenValiditySeconds(60);
         return http.build();
+
     }
 
-    // different from Spring 2.x we need to implement AuthenticationManager by ourself
+    // different from Spring 2.x we need to implement AuthenticationManager by ourselves
     @Bean
     public AuthenticationManager authenticationManager() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
