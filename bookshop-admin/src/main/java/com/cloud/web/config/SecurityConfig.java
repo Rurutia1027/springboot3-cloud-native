@@ -72,7 +72,7 @@ public class SecurityConfig {
                 .rememberMe()
                 .tokenRepository(persistentTokenRepository())
                 // how long will Remember Me store the token to persistent_logins db table
-                .tokenValiditySe conds(60);
+                .tokenValiditySeconds(60);
         return http.build();
     }
 
