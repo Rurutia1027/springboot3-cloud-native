@@ -49,7 +49,8 @@ public class SecurityConfig {
                         .requestMatchers("/book/**").authenticated()
                         // other url address should be authenticated
                         .anyRequest().authenticated())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .formLogin(form -> form
                         .loginPage("/login.html")
                         .loginProcessingUrl("/auth")
@@ -71,7 +72,7 @@ public class SecurityConfig {
                 .rememberMe()
                 .tokenRepository(persistentTokenRepository())
                 // how long will Remember Me store the token to persistent_logins db table
-                .tokenValiditySeconds(60);
+                .tokenValiditySe conds(60);
         return http.build();
     }
 
