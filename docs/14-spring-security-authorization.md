@@ -11,7 +11,7 @@
 - **Authorization** refers to the process of determining whether a user has the correct permissions to access a particular resource. 
 - In **Spring Security**, authorization typically happens after authentication (which determines who the user is). 
 
-
+ 
 ### Key Components in Authorization 
 #### Roles && Authorities 
 - **Roles**: High-level categories that groups users, e.g., **ADMIN**, **USER**. 

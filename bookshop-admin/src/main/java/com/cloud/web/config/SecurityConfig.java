@@ -7,6 +7,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.authorization.AuthorityAuthorizationManager;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,6 +22,7 @@ import javax.sql.DataSource;
 import java.util.List;
 
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Autowired
@@ -50,16 +52,16 @@ public class SecurityConfig {
                         .requestMatchers("/book/**").authenticated()
                         // other url address should be authenticated
                         .anyRequest().access(AuthorityAuthorizationManager.hasAnyAuthority("admin")))
-                        .sessionManagement(session ->
-                                session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-                        .formLogin(form -> form
-                                .loginPage("/login.html")
-                                .loginProcessingUrl("/auth")
-                                .usernameParameter("user")
-                                .passwordParameter("pass")
-                                .successHandler(bookShopAuthenticaitonSuccessHandler)
-                                .failureHandler(bookShopAuthenticationFailureHandler)
-                                .permitAll())
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .formLogin(form -> form
+                        .loginPage("/login.html")
+                        .loginProcessingUrl("/auth")
+                        .usernameParameter("user")
+                        .passwordParameter("pass")
+                        .successHandler(bookShopAuthenticaitonSuccessHandler)
+                        .failureHandler(bookShopAuthenticationFailureHandler)
+                        .permitAll())
 //                        // session manager
 //                        .sessionManagement()
 //                        // when session got expired which url to redirect -> #invalidSessionUrl()
@@ -70,10 +72,10 @@ public class SecurityConfig {
 //                        .maxSessionsPreventsLogin(true)
 //                        .and()
 //                        .and()
-                        .rememberMe()
-                        .tokenRepository(persistentTokenRepository())
-                        // how long will Remember Me store the token to persistent_logins db table
-                        .tokenValiditySeconds(60);
+                .rememberMe()
+                .tokenRepository(persistentTokenRepository())
+                // how long will Remember Me store the token to persistent_logins db table
+                .tokenValiditySeconds(60);
         return http.build();
     }
 
