@@ -1,6 +1,6 @@
 package com.cloud.web.controller;
 
-import com.cloud.dto.FileInfo;
+import com.cloud.web.dto.FileInfo;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;

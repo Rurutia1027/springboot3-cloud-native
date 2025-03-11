@@ -1,8 +1,8 @@
 package com.cloud.web.controller;
 
 
-import com.cloud.dto.BookCondition;
-import com.cloud.dto.BookInfo;
+import com.cloud.web.dto.BookCondition;
+import com.cloud.web.dto.BookInfo;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

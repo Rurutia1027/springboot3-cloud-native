@@ -1,4 +1,4 @@
-package com.cloud.dto;
+package com.cloud.web.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

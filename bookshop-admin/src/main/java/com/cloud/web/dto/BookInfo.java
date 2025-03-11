@@ -1,4 +1,4 @@
-package com.cloud.dto;
+package com.cloud.web.dto;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.v3.oas.annotations.media.Schema;

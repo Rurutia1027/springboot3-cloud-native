@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.authorization.AuthorityAuthorizationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -48,35 +49,35 @@ public class SecurityConfig {
                         .requestMatchers("/book", "/login.html", "/auth", "/session.html").permitAll()
                         .requestMatchers("/book/**").authenticated()
                         // other url address should be authenticated
-                        .anyRequest().authenticated())
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-                .formLogin(form -> form
-                        .loginPage("/login.html")
-                        .loginProcessingUrl("/auth")
-                        .usernameParameter("user")
-                        .passwordParameter("pass")
-                        .successHandler(bookShopAuthenticaitonSuccessHandler)
-                        .failureHandler(bookShopAuthenticationFailureHandler)
-                        .permitAll())
-                // session manager
-                .sessionManagement()
-                // when session got expired which url to redirect -> #invalidSessionUrl()
-                .invalidSessionUrl("/session.html")
-                .maximumSessions(1)
-                // When a user reaches the maximum allowed sessions,
-                // any attempt to log in from another device or browser will be denied.
-                .maxSessionsPreventsLogin(true)
-                .and()
-                .and()
-                .rememberMe()
-                .tokenRepository(persistentTokenRepository())
-                // how long will Remember Me store the token to persistent_logins db table
-                .tokenValiditySeconds(60);
+                        .anyRequest().access(AuthorityAuthorizationManager.hasAnyAuthority("admin")))
+                        .sessionManagement(session ->
+                                session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                        .formLogin(form -> form
+                                .loginPage("/login.html")
+                                .loginProcessingUrl("/auth")
+                                .usernameParameter("user")
+                                .passwordParameter("pass")
+                                .successHandler(bookShopAuthenticaitonSuccessHandler)
+                                .failureHandler(bookShopAuthenticationFailureHandler)
+                                .permitAll())
+//                        // session manager
+//                        .sessionManagement()
+//                        // when session got expired which url to redirect -> #invalidSessionUrl()
+//                        .invalidSessionUrl("/session.html")
+//                        .maximumSessions(1)
+//                        // When a user reaches the maximum allowed sessions,
+//                        // any attempt to log in from another device or browser will be denied.
+//                        .maxSessionsPreventsLogin(true)
+//                        .and()
+//                        .and()
+                        .rememberMe()
+                        .tokenRepository(persistentTokenRepository())
+                        // how long will Remember Me store the token to persistent_logins db table
+                        .tokenValiditySeconds(60);
         return http.build();
     }
 
-    // different from Spring 2.x we need to implement AuthenticationManager by ourself
+    // different from Spring 2.x we need to implement AuthenticationManager by ourselves
     @Bean
     public AuthenticationManager authenticationManager() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
