@@ -45,7 +45,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         // all request query /book endpoint are allowed
-                        .requestMatchers("/book", "/login.html", "/auth").permitAll()
+                        .requestMatchers("/book", "/login.html", "/auth", "/session.html").permitAll()
                         .requestMatchers("/book/**").authenticated()
                         // other url address should be authenticated
                         .anyRequest().authenticated())
@@ -58,6 +58,16 @@ public class SecurityConfig {
                         .successHandler(bookShopAuthenticaitonSuccessHandler)
                         .failureHandler(bookShopAuthenticationFailureHandler)
                         .permitAll())
+                // session manager
+                .sessionManagement()
+                // when session got expired which url to redirect -> #invalidSessionUrl()
+                .invalidSessionUrl("/session.html")
+                .maximumSessions(1)
+                // When a user reaches the maximum allowed sessions,
+                // any attempt to log in from another device or browser will be denied.
+                .maxSessionsPreventsLogin(true)
+                .and()
+                .and()
                 .rememberMe()
                 .tokenRepository(persistentTokenRepository())
                 // how long will Remember Me store the token to persistent_logins db table
