@@ -7,9 +7,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
@@ -24,7 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
+// @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest
 @AutoConfigureMockMvc
 class BookControllerTest {
@@ -33,6 +32,7 @@ class BookControllerTest {
     private MockMvc mockMvc;
 
     @Test
+    @DirtiesContext
     @WithMockUser(username = "user", roles = {"USER"})
     public void whenBookQuerySuccess() throws Exception {
         mockMvc.perform(get("/book")
@@ -47,6 +47,7 @@ class BookControllerTest {
     }
 
     @Test
+    @DirtiesContext
     @WithMockUser(username = "user", roles = {"USER"})
     public void whenGetInfoSuccess() throws Exception {
         String ret = mockMvc.perform(get("/book/1")
@@ -61,6 +62,7 @@ class BookControllerTest {
 
 
     @Test
+    @DirtiesContext
     @WithMockUser(username = "user", roles = {"USER"})
     public void whenGetInfoFail() throws Exception {
         mockMvc.perform(get("/book/10")
@@ -69,6 +71,7 @@ class BookControllerTest {
     }
 
     @Test
+    @DirtiesContext
     @WithMockUser(username = "user", roles = {"USER"})
     public void whenCreateSuccess() throws Exception {
         mockMvc.perform(post("/book")
@@ -80,12 +83,9 @@ class BookControllerTest {
 
 
     @Test
+    @DirtiesContext
     @WithMockUser(username = "user", roles = {"USER"})
     public void whenUpdateSuccess() throws Exception {
-        // print authentication logic here
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("Authenticated user: " + authentication.getName());
-
         String content = "{\"id\":1,\"name\":\"test_book\",\"content\":\"test_book\",\"publishDate\":\"2025-05-05\"}";
         mockMvc.perform(put("/book/1")
                         .with(csrf())
@@ -95,6 +95,7 @@ class BookControllerTest {
     }
 
     @Test
+    @DirtiesContext
     @WithMockUser(username = "user", roles = {"USER"})
     public void whenDeleteSuccess() throws Exception {
         mockMvc.perform(delete("/book/1")
@@ -105,6 +106,7 @@ class BookControllerTest {
 
     // annotations for handling cookies or headers
     @Test
+    @DirtiesContext
     @WithMockUser(username = "user", roles = {"USER"})
     public void whenCookieOrHeaderExists() throws Exception {
         mockMvc.perform(get("/book/1")
