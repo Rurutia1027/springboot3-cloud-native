@@ -4,6 +4,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 public interface BookService {
 
-    @PreAuthorize("hasAuthority('xxx')")
+    @PreAuthorize("hasAnyRole('xxx', 'my_tester')")
     void getInfo(Long id);
 }

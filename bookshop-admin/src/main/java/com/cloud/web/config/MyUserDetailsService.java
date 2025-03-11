@@ -19,7 +19,7 @@ public class MyUserDetailsService implements UserDetailsService {
                     // so that the user has the role of admin
                     // then the user is allowed to get access to the target resource url endpoint
                     // after he/she is authenticated by username/password successfully.
-                    AuthorityUtils.createAuthorityList("admin", "xxx")
+                    AuthorityUtils.createAuthorityList("admin", "xxx", "my_tester")
             );
         }
         return null;

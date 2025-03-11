@@ -33,6 +33,9 @@ public class SecurityConfig {
     @Autowired
     private DataSource dataSource;
 
+    @Autowired
+    private BookSecurityAuthorizationManager bookSecurityAuthorizationManager;
+
     @Bean
     public PersistentTokenRepository persistentTokenRepository() {
         JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
@@ -51,6 +54,8 @@ public class SecurityConfig {
                         .requestMatchers("/book", "/login.html", "/auth", "/session.html").permitAll()
                         .requestMatchers("/book/**").authenticated()
                         // other url address should be authenticated
+                        // declare customized authorized handler here
+                        //.anyRequest().access(bookSecurityAuthorizationManager))
                         .anyRequest().access(AuthorityAuthorizationManager.hasAnyAuthority("admin")))
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
