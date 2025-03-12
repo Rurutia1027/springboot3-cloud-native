@@ -17,6 +17,7 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 import javax.sql.DataSource;
 import java.util.List;
@@ -48,7 +49,11 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.httpBasic()
                 .and()
-                .csrf(csrf -> csrf.disable())
+                // .csrf(csrf -> csrf.disable())
+                // Ensures XSRF-TOKEN cookie is sent
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        .ignoringRequestMatchers("/auth"))
                 .authorizeHttpRequests(auth -> auth
                         // all request query /book endpoint are allowed
                         .requestMatchers("/book", "/login.html", "/auth", "/session.html").permitAll()
@@ -57,8 +62,10 @@ public class SecurityConfig {
                         // declare customized authorized handler here
                         //.anyRequest().access(bookSecurityAuthorizationManager))
                         .anyRequest().access(AuthorityAuthorizationManager.hasAnyAuthority("admin")))
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .sessionFixation()
+                        .changeSessionId())
+
                 .formLogin(form -> form
                         .loginPage("/login.html")
                         .loginProcessingUrl("/auth")
