@@ -52,8 +52,10 @@ public class SecurityConfig {
                         .requestMatchers("/book/**").authenticated()
                         // other url address should be authenticated
                         .anyRequest().access(AuthorityAuthorizationManager.hasAnyAuthority("admin")))
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .sessionFixation()
+                        .changeSessionId())
+
                 .formLogin(form -> form
                         .loginPage("/login.html")
                         .loginProcessingUrl("/auth")
