@@ -17,7 +17,6 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 import javax.sql.DataSource;
 import java.util.List;
@@ -49,23 +48,26 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.httpBasic()
                 .and()
-                // .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf.disable())
+                // Enables OAuth2 login as a client
+                .oauth2Login()
+                .and()
                 // Ensures XSRF-TOKEN cookie is sent
-                .csrf(csrf -> csrf
+                /*.csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .ignoringRequestMatchers("/auth"))
+                        .ignoringRequestMatchers("/auth"))*/
                 .authorizeHttpRequests(auth -> auth
                         // all request query /book endpoint are allowed
-                        .requestMatchers("/book", "/login.html", "/auth", "/session.html").permitAll()
+                        .requestMatchers("/book", "/login.html", "/auth", "/oauth2/**", "/session.html").permitAll()
                         .requestMatchers("/book/**").authenticated()
                         // other url address should be authenticated
                         // declare customized authorized handler here
                         //.anyRequest().access(bookSecurityAuthorizationManager))
                         .anyRequest().access(AuthorityAuthorizationManager.hasAnyAuthority("admin")))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                        .sessionFixation()
-                        .changeSessionId())
-
+//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+//                        .sessionFixation()
+//                        .changeSessionId())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .formLogin(form -> form
                         .loginPage("/login.html")
                         .loginProcessingUrl("/auth")
