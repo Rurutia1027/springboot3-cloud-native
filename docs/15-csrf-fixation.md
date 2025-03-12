@@ -1,4 +1,4 @@
-# Spring Security: CSRF && Session Fixation 
+# Spring Security: CSRF && Session Fixation && XSS 
 
 ## CSRF (Coros-Site Request Forgery)
 - **Default Behavior**: CSRF is enabled by default for **form-based authentication**.
@@ -22,6 +22,16 @@ http.csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnl
 http.sessionManagement(session -> sesion
     .sessionFixation(SessionFixationConfigurer::migrateSession)) // default
 ```
+## XSS(Cross-Site Scripting) Protection
+- Prevent XSS attacks using Spring Security headers
+```java
+http.headers(headers -> headers)
+    .xssProtection(xss -> xss.block(true)) // here enable XSS protection 
+    .contentSecurityPolicy("script-src 'self'") // here we block inline scripts
+); 
+```
+
+
 #### Different session fixation strategies:
 - `migrateSession()` -> Creates a new session, copies attributes. (Secure & default)
 - `newSession()` -> Creates a completetly fresh session (better for high-security apps).
@@ -38,3 +48,11 @@ http.sessionManagement(session -> session
      .maxSessionsPreventsLogin(true) // prevent multiple logins
 ); 
 ```
+
+
+### Best Practice for XSS Prevention 
+- Enable **CSP(Content Security Policy)**
+  - `script-src 'self'` -> This blocksinline JavaScript execution. 
+- Escape user input (use OWASP Java Encoder).
+- Sanitize HTML input (Use jsoup or similar libraries).
+- Disable inine JavaScript execution where possible. 
