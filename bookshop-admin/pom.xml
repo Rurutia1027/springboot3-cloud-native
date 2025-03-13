@@ -141,7 +141,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
                 <configuration>
-                    <mainClass>com.cloud.web.controller.BookshopAdminApplication</mainClass>
+                    <mainClass>com.cloud.bookshop.web.controller.BookshopAdminApplication</mainClass>
                     <skip>true</skip>
                 </configuration>
                 <executions>
