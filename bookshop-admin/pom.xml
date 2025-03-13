@@ -35,7 +35,7 @@
         <!-- import bookshop dependency -->
         <dependency>
             <groupId>com.cloud.bookshop</groupId>
-            <artifactId>data</artifactId>
+            <artifactId>bookshop-data</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>

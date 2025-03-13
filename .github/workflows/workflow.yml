@@ -35,7 +35,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: bookshop-service-jar
-          path: ~/.m2/repository/com/cloud/bookshop/bookshop-service/0.0.1-SNAPSHOT/bookshop-service-0.0.1-SNAPSHOT.jar
+          path: ~/.m2/repository/com/cloud/bookshop/bookshop-service/
 
   bookshop-data:
     runs-on: ubuntu-latest
@@ -83,24 +83,24 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: bookshop-service-jar
-          path: ~/.m2/repository/com/cloud/bookshop/bookshop-service/0.0.1-SNAPSHOT/
+          path: ~/.m2/repository/com/cloud/bookshop/bookshop-service/
 
       - name: Build Bookshop
         run: |
-          cd bookshop
+          cd bookshop-data
           mvn clean install -DskipTests
           echo "BookShop build completed. JAR should now be in ~/.m2/repository."
 
-      - name: Upload Data JAR Artifact
+      - name: Upload BookShop-Data JAR Artifact
         uses: actions/upload-artifact@v4
         with:
           name: data-jar
-          path: ~/.m2/repository/com/cloud/bookshop/data/0.0.1-SNAPSHOT/data-0.0.1-SNAPSHOT.jar
+          path: ~/.m2/repository/com/cloud/bookshop/bookshop-data/
 
 
       - name: Run Tests with JaCoCo
         run: |
-          cd bookshop && mvn test jacoco:report
+          cd bookshop-data && mvn test jacoco:report
           ls target/site/jacoco/jacoco.xml
 
       - name: Upload BookShop Test Coverage to DeepSource
@@ -108,8 +108,8 @@ jobs:
           DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
         run: |
           curl https://deepsource.com/cli | sh
-          pwd && ls bookshop/target/site/jacoco/jacoco.xml
-          ./bin/deepsource report --analyzer test-coverage --key java --value-file bookshop/target/site/jacoco/jacoco.xml
+          pwd && ls bookshop-data/target/site/jacoco/jacoco.xml
+          ./bin/deepsource report --analyzer test-coverage --key java --value-file bookshop-data/target/site/jacoco/jacoco.xml
 
   bookshop-admin:
     runs-on: ubuntu-latest
