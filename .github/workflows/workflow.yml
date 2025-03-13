@@ -27,7 +27,8 @@ jobs:
       - name: Build & Install Bookshop-Service
         run: |
           cd bookshop-service
-          mvn clean install
+          mvn clean install 
+          ls ~/.m2/repository/com/cloud/bookshop/*
           echo "Bookshop-Service JAR installed in ~/.m2/repository."
 
       - name: Upload Bookshop-Service JAR Artifact
@@ -36,13 +37,7 @@ jobs:
           name: bookshop-service-jar
           path: ~/.m2/repository/com/cloud/bookshop/bookshop-service/0.0.1-SNAPSHOT/bookshop-service-0.0.1-SNAPSHOT.jar
 
-      - name: Upload Data JAR Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: data-jar
-          path: ~/.m2/repository/com/cloud/bookshop/data/0.0.1-SNAPSHOT/data-0.0.1-SNAPSHOT.jar
-
-  bookshop:
+  bookshop-data:
     runs-on: ubuntu-latest
     needs: bookshop-service
 
@@ -90,17 +85,18 @@ jobs:
           name: bookshop-service-jar
           path: ~/.m2/repository/com/cloud/bookshop/bookshop-service/0.0.1-SNAPSHOT/
 
-      - name: Download Data JAR Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: data-jar
-          path: ~/.m2/repository/com/cloud/bookshop/data/0.0.1-SNAPSHOT/
-
       - name: Build Bookshop
         run: |
           cd bookshop
           mvn clean install -DskipTests
           echo "BookShop build completed. JAR should now be in ~/.m2/repository."
+
+      - name: Upload Data JAR Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: data-jar
+          path: ~/.m2/repository/com/cloud/bookshop/data/0.0.1-SNAPSHOT/data-0.0.1-SNAPSHOT.jar
+
 
       - name: Run Tests with JaCoCo
         run: |
@@ -118,7 +114,7 @@ jobs:
   bookshop-admin:
     runs-on: ubuntu-latest
     needs:
-      - bookshop
+      - bookshop-data
       - bookshop-service
     services:
       mysql:
