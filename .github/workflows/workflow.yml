@@ -99,8 +99,9 @@ jobs:
 
   bookshop-admin:
     runs-on: ubuntu-latest
-    needs: bookshop # ✅ depends `bookshop` make sure `bookshop` compile finish
-
+    needs:
+      - bookshop          # depends on bookshop
+      - bookshop-service  # depends on bookshop-service
     services:
       mysql:
         image: mysql:latest
