@@ -24,25 +24,23 @@ jobs:
           java-version: "17"
           cache: maven
 
-      - name: Cache Maven Dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            maven-${{ runner.os }}-
-
       - name: Build & Install Bookshop-Service
         run: |
           cd bookshop-service
-          mvn clean install 
+          mvn clean install
           echo "Bookshop-Service JAR installed in ~/.m2/repository."
 
-      - name: Upload Bookshop-Service Artifacts
+      - name: Upload Bookshop-Service JAR Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: maven-repo
-          path: ~/.m2/repository
+          name: bookshop-service-jar
+          path: ~/.m2/repository/com/cloud/bookshop/bookshop-service/0.0.1-SNAPSHOT/bookshop-service-0.0.1-SNAPSHOT.jar
+
+      - name: Upload Data JAR Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: data-jar
+          path: ~/.m2/repository/com/cloud/bookshop/data/0.0.1-SNAPSHOT/data-0.0.1-SNAPSHOT.jar
 
   bookshop:
     runs-on: ubuntu-latest
@@ -86,23 +84,23 @@ jobs:
           sudo apt-get install -y mysql-client
           mysql -h 127.0.0.1 -uadmin -padmin -e "SHOW DATABASES;"
 
-      - name: Download Maven Repository Cache
+      - name: Download Bookshop-Service JAR Artifact
         uses: actions/download-artifact@v4
         with:
-          name: maven-repo
-          path: ~/.m2/repository
+          name: bookshop-service-jar
+          path: ~/.m2/repository/com/cloud/bookshop/bookshop-service/0.0.1-SNAPSHOT/
 
-      - name: Build & Install BookShop
+      - name: Download Data JAR Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: data-jar
+          path: ~/.m2/repository/com/cloud/bookshop/data/0.0.1-SNAPSHOT/
+
+      - name: Build Bookshop
         run: |
           cd bookshop
           mvn clean install -DskipTests
           echo "BookShop build completed. JAR should now be in ~/.m2/repository."
-
-      - name: Upload Bookshop-Service Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: maven-repo
-          path: ~/.m2/repository
 
       - name: Run Tests with JaCoCo
         run: |
@@ -160,11 +158,17 @@ jobs:
           sudo apt-get install -y mysql-client
           mysql -h 127.0.0.1 -uadmin -padmin -e "SHOW DATABASES;"
 
-      - name: Download Maven Repository Cache
+      - name: Download Bookshop-Service JAR Artifact
         uses: actions/download-artifact@v4
         with:
-          name: maven-repo
-          path: ~/.m2/repository
+          name: bookshop-service-jar
+          path: ~/.m2/repository/com/cloud/bookshop/bookshop-service/0.0.1-SNAPSHOT/
+
+      - name: Download Data JAR Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: data-jar
+          path: ~/.m2/repository/com/cloud/bookshop/data/0.0.1-SNAPSHOT/
 
       - name: Build Bookshop-Admin
         run: |
