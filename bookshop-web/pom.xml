@@ -59,7 +59,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
                 <configuration>
-                    <mainClass>com.cloud.bookshopweb.BookshopWebApplication</mainClass>
+                    <mainClass>com.cloud.bookshop.web.BookshopWebApplication</mainClass>
                     <skip>true</skip>
                 </configuration>
                 <executions>
