@@ -1,9 +1,9 @@
 package com.cloud.bookshop.web.controller;
 
 
-import com.cloud.bookshop.dto.BookCondition;
-import com.cloud.bookshop.dto.BookInfo;
-import com.cloud.bookshop.service.BookService;
+import com.cloud.bookshop.dubbo.dto.BookCondition;
+import com.cloud.bookshop.dubbo.dto.BookInfo;
+import com.cloud.bookshop.dubbo.service.BookService;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/book")
@@ -83,12 +82,8 @@ public class BookController {
             System.out.println("Authentication#principal " + authentication);
         }
 
-        BookInfo ret = new BookInfo();
-        ret.setName(UUID.randomUUID().toString());
-        ret.setId(2465675L);
-        ret.setPublishDate(new Date());
-        ret.setContent(UUID.randomUUID().toString());
-        return ret;
+        BookInfo bookInfo = bookService.getInfo(id);
+        return bookInfo;
     }
 
 

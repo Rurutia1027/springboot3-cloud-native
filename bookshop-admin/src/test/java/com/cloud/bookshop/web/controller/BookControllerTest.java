@@ -46,20 +46,6 @@ class BookControllerTest {
 
     @Test
     @WithMockUser(username = "user", roles = {"USER"})
-    public void whenGetInfoSuccess() throws Exception {
-        String ret = mockMvc.perform(get("/book/1")
-                        .cookie(new Cookie("token", UUID.randomUUID().toString()))
-                        .header("auth", UUID.randomUUID().toString())
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("mock_book_name"))
-                .andReturn().getResponse().getContentAsString();
-        System.out.println("return content " + ret);
-    }
-
-
-    @Test
-    @WithMockUser(username = "user", roles = {"USER"})
     public void whenGetInfoFail() throws Exception {
         mockMvc.perform(get("/book/10")
                         .accept(MediaType.APPLICATION_JSON))

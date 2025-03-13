@@ -51,7 +51,7 @@ Setting up a **bidirectional** relationship between `Category` and `Book`.
   associated Book entities.
 
 ```java
-import com.cloud.bookshop.domain.Book;
+import com.cloud.bookshop.data.domain.Book;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.OneToMany;
 
@@ -67,7 +67,7 @@ private List<Book> bookList;
   explicitly.
 
 ```java
-import com.cloud.bookshop.domain.Category;
+import com.cloud.bookshop.data.domain.Category;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 
@@ -90,7 +90,7 @@ In a one-to-one relationship, let the most frequently used side (in this case, t
 - `Author.java`
 
 ```java
-import com.cloud.bookshop.domain.AuthorInfo;
+import com.cloud.bookshop.data.domain.AuthorInfo;
 import jakarta.persistence.OneToOne;
 
 @OneToOne
@@ -122,7 +122,7 @@ private Author author;
 - Author.java
 
 ```java
-import com.cloud.bookshop.domain.Address;
+import com.cloud.bookshop.data.domain.Address;
 import jakarta.persistence.ElementCollection;
 
 @ElementCollection
@@ -175,7 +175,7 @@ private List<BookAuthor> books;
 - Book.java
 
 ```java
-import com.cloud.bookshop.domain.BookAuthor;
+import com.cloud.bookshop.data.domain.BookAuthor;
 import jakarta.persistence.OneToMany;
 
 
