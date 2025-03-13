@@ -54,6 +54,7 @@
             <groupId>com.cloud.bookshop</groupId>
             <artifactId>bookshop-service</artifactId>
             <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
     <dependencyManagement>
