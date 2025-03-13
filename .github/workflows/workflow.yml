@@ -87,7 +87,7 @@ jobs:
 
       - name: Build Bookshop
         run: |
-          cd bookshop
+          cd bookshop-data
           mvn clean install -DskipTests
           echo "BookShop build completed. JAR should now be in ~/.m2/repository."
 
