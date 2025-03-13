@@ -98,16 +98,16 @@ jobs:
           mvn clean install -DskipTests
           echo "BookShop build completed. JAR should now be in ~/.m2/repository."
 
-      - name: Run Tests with JaCoCo
-        run: |
-          cd bookshop && mvn test jacoco:report
-          ls target/site/jacoco/jacoco.xml
-
       - name: Upload Bookshop-Service Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: maven-repo
           path: ~/.m2/repository
+
+      - name: Run Tests with JaCoCo
+        run: |
+          cd bookshop && mvn test jacoco:report
+          ls target/site/jacoco/jacoco.xml
 
       - name: Upload BookShop Test Coverage to DeepSource
         env:
