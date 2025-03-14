@@ -49,25 +49,12 @@ public class SecurityConfig {
         http.httpBasic()
                 .and()
                 .csrf(csrf -> csrf.disable())
-                // Enables OAuth2 login as a client
-                .oauth2Login()
-                .and()
-                // Ensures XSRF-TOKEN cookie is sent
-                /*.csrf(csrf -> csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .ignoringRequestMatchers("/auth"))*/
                 .authorizeHttpRequests(auth -> auth
-                        // all request query /book endpoint are allowed
-                        .requestMatchers("/book", "/login.html", "/auth", "/oauth2/**", "/session.html").permitAll()
+                        .requestMatchers("/book", "/login.html", "/auth", "/session.html").permitAll()
                         .requestMatchers("/book/**").authenticated()
-                        // other url address should be authenticated
-                        // declare customized authorized handler here
-                        //.anyRequest().access(bookSecurityAuthorizationManager))
                         .anyRequest().access(AuthorityAuthorizationManager.hasAnyAuthority("admin")))
-//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-//                        .sessionFixation()
-//                        .changeSessionId())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .formLogin(form -> form
                         .loginPage("/login.html")
                         .loginProcessingUrl("/auth")
@@ -76,19 +63,14 @@ public class SecurityConfig {
                         .successHandler(bookShopAuthenticaitonSuccessHandler)
                         .failureHandler(bookShopAuthenticationFailureHandler)
                         .permitAll())
-                // session manager
                 .sessionManagement()
-                // when session got expired which url to redirect -> #invalidSessionUrl()
                 .invalidSessionUrl("/session.html")
-                .maximumSessions(1)
-                // When a user reaches the maximum allowed sessions,
-                // any attempt to log in from another device or browser will be denied.
+                .maximumSessions(3)
                 .maxSessionsPreventsLogin(false)
                 .and()
                 .and()
                 .rememberMe()
                 .tokenRepository(persistentTokenRepository())
-                // how long will Remember Me store the token to persistent_logins db table
                 .tokenValiditySeconds(60);
         return http.build();
     }
