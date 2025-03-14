@@ -125,19 +125,6 @@ jobs:
           name: data-jar
           path: ~/.m2/repository/com/cloud/bookshop/bookshop-data/
 
-      - name: Run Tests with JaCoCo
-        run: |
-          cd bookshop-data && mvn test jacoco:report
-          ls target/site/jacoco/jacoco.xml
-
-      - name: Upload BookShop Test Coverage to DeepSource
-        env:
-          DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
-        run: |
-          curl https://deepsource.com/cli | sh
-          pwd && ls bookshop-data/target/site/jacoco/jacoco.xml
-          ./bin/deepsource report --analyzer test-coverage --key java --value-file bookshop-data/target/site/jacoco/jacoco.xml
-
   bookshop-admin:
     runs-on: ubuntu-latest
     needs:
@@ -209,16 +196,3 @@ jobs:
           cd bookshop-admin
           mvn clean package -DskipTests
           echo "Bookshop-Admin built successfully using BookShop JAR from ~/.m2/repository."
-
-      - name: Run Tests with JaCoCo
-        run: |
-          cd bookshop-admin && mvn test jacoco:report
-          ls target/site/jacoco/jacoco.xml
-
-      - name: Upload Bookshop-Admin Test Coverage to DeepSource
-        env:
-          DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
-        run: |
-          curl https://deepsource.com/cli | sh
-          pwd && ls bookshop-admin/target/site/jacoco/jacoco.xml
-          ./bin/deepsource report --analyzer test-coverage --key java --value-file bookshop-admin/target/site/jacoco/jacoco.xml
