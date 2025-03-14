@@ -4,7 +4,6 @@ package com.cloud.bookshop.web.controller;
 import com.cloud.bookshop.dubbo.dto.BookCondition;
 import com.cloud.bookshop.dubbo.dto.BookInfo;
 import com.cloud.bookshop.dubbo.service.BookService;
-import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -38,7 +37,6 @@ public class BookController {
     private BookService bookService;
 
     @GetMapping
-    @JsonView(BookInfo.BookListView.class)
     @Operation(summary = "Get greeting message", description = "This API returns a greeting message")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved greeting message"),
@@ -85,7 +83,6 @@ public class BookController {
 
 
     @GetMapping("/{id}")
-    @JsonView(BookInfo.BookDetailView.class)
     public BookInfo getInfo(@PathVariable Long id, @CookieValue String token, @RequestHeader String auth) {
         System.out.println("recv variable id is " + id);
         System.out.println("recv token value is " + token);
