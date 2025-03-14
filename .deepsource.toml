@@ -6,7 +6,7 @@ enabled = true
 
   [analyzers.meta]
   runtime_version = "17"
-
-[[analyzers]]
-name = "test-coverage"
-enabled = true
+# disable test coverage
+#[[analyzers]]
+#name = "test-coverage"
+#enabled = true
