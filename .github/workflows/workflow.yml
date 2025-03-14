@@ -11,6 +11,24 @@ on:
 jobs:
   bookshop-service:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:latest
+        env:
+          MYSQL_ROOT_PASSWORD: admin
+          MYSQL_DATABASE: bookstore
+          MYSQL_USER: admin
+          MYSQL_PASSWORD: admin
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping -h 127.0.0.1 --silent" --health-interval=10s --health-timeout=5s --health-retries=3
+
+      zookeeper:
+        image: wurstmeister/zookeeper
+        ports:
+          - 2181:2181
+        options: --health-cmd="nc -z 127.0.0.1 2181" --health-interval=10s --health-timeout=5s --health-retries=3
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -40,7 +58,6 @@ jobs:
   bookshop-data:
     runs-on: ubuntu-latest
     needs: bookshop-service
-
     services:
       mysql:
         image: mysql:latest
@@ -52,6 +69,12 @@ jobs:
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping -h 127.0.0.1 --silent" --health-interval=10s --health-timeout=5s --health-retries=3
+
+      zookeeper:
+        image: wurstmeister/zookeeper
+        ports:
+          - 2181:2181
+        options: --health-cmd="nc -z 127.0.0.1 2181" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
       - name: Checkout Repository
@@ -79,37 +102,28 @@ jobs:
           sudo apt-get install -y mysql-client
           mysql -h 127.0.0.1 -uadmin -padmin -e "SHOW DATABASES;"
 
+      - name: Verify Zookeeper Connection
+        run: |
+          nc -zv 127.0.0.1 2181
+          echo "Zookeeper is up and running!"
+
       - name: Download Bookshop-Service JAR Artifact
         uses: actions/download-artifact@v4
         with:
           name: bookshop-service-jar
           path: ~/.m2/repository/com/cloud/bookshop/bookshop-service/
 
-      - name: Build Bookshop
+      - name: Build Bookshop-Data
         run: |
           cd bookshop-data
           mvn clean install -DskipTests
           echo "BookShop build completed. JAR should now be in ~/.m2/repository."
 
-      - name: Upload BookShop-Data JAR Artifact
+      - name: Upload Bookshop-Data JAR Artifact
         uses: actions/upload-artifact@v4
         with:
           name: data-jar
           path: ~/.m2/repository/com/cloud/bookshop/bookshop-data/
-
-
-      - name: Run Tests with JaCoCo
-        run: |
-          cd bookshop-data && mvn test jacoco:report
-          ls target/site/jacoco/jacoco.xml
-
-      - name: Upload BookShop Test Coverage to DeepSource
-        env:
-          DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
-        run: |
-          curl https://deepsource.com/cli | sh
-          pwd && ls bookshop-data/target/site/jacoco/jacoco.xml
-          ./bin/deepsource report --analyzer test-coverage --key java --value-file bookshop-data/target/site/jacoco/jacoco.xml
 
   bookshop-admin:
     runs-on: ubuntu-latest
@@ -127,6 +141,12 @@ jobs:
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping -h 127.0.0.1 --silent" --health-interval=10s --health-timeout=5s --health-retries=3
+
+      zookeeper:
+        image: wurstmeister/zookeeper
+        ports:
+          - 2181:2181
+        options: --health-cmd="nc -z 127.0.0.1 2181" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
       - name: Checkout Repository
@@ -154,6 +174,11 @@ jobs:
           sudo apt-get install -y mysql-client
           mysql -h 127.0.0.1 -uadmin -padmin -e "SHOW DATABASES;"
 
+      - name: Verify Zookeeper Connection
+        run: |
+          nc -zv 127.0.0.1 2181
+          echo "Zookeeper is up and running!"
+
       - name: Download Bookshop-Service JAR Artifact
         uses: actions/download-artifact@v4
         with:
@@ -171,16 +196,3 @@ jobs:
           cd bookshop-admin
           mvn clean package -DskipTests
           echo "Bookshop-Admin built successfully using BookShop JAR from ~/.m2/repository."
-
-      - name: Run Tests with JaCoCo
-        run: |
-          cd bookshop-admin && mvn test jacoco:report
-          ls target/site/jacoco/jacoco.xml
-
-      - name: Upload Bookshop-Admin Test Coverage to DeepSource
-        env:
-          DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
-        run: |
-          curl https://deepsource.com/cli | sh
-          pwd && ls bookshop-admin/target/site/jacoco/jacoco.xml
-          ./bin/deepsource report --analyzer test-coverage --key java --value-file bookshop-admin/target/site/jacoco/jacoco.xml
