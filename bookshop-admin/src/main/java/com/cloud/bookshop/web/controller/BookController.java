@@ -71,10 +71,7 @@ public class BookController {
     }
 
     @GetMapping("/item/{id}")
-    @JsonView(BookInfo.BookDetailView.class)
     public BookInfo getBookInfo(@PathVariable Long id) {
-        bookService.getInfo(id);
-
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         System.out.println("Authentication " + authentication);
 
