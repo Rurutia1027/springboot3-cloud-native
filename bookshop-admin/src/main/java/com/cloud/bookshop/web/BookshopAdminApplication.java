@@ -10,7 +10,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class BookshopAdminApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(BookshopAdminApplication.class, args);
+        SpringApplication application = new SpringApplication(BookshopAdminApplication.class);
+        // application.setAdditionalProfiles("dev");
+        application.run(args);
     }
 
 }
