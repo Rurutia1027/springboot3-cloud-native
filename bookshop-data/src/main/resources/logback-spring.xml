@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+
+    <!-- non-prod level console print -->
+    <springProfile name="pro">
+        <property name="TO_CONSOLE" value="false"/>
+    </springProfile>
+    <springProfile name="!pro">
+        <property name="TO_CONSOLE" value="true"/>
+    </springProfile>
+
+    <!-- Console Output -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50}:%line - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- generate logs at a daily granularity level -->
+    <appender name="FILE"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${LOG_FILE}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <fileNamePattern>${LOG_PATH}/${LOG_FILE}-%d{yyyy-MM-dd}.%i.log
+            </fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <!-- or whenever the file size reaches 100MB -->
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50}:%line - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- Log output level -->
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+    <logger name="com" level="INFO" additivity="${TO_CONSOLE}">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <logger name="org" level="INFO" additivity="${TO_CONSOLE}">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+</configuration>
