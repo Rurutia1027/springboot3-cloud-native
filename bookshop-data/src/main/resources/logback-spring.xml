@@ -50,4 +50,9 @@
         <appender-ref ref="FILE"/>
     </logger>
 
+    <logger name="com.cloud.bookshop.data.aspect.ServiceLogAspect" level="INFO" additivity="true">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </logger>
+
 </configuration>

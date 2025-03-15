@@ -25,6 +25,7 @@ class BookServiceImplTest extends BaseTest {
         String bName = UUID.randomUUID().toString();
         info.setName(bName);
         BookInfo retInfo = bookService.create(info);
+        Assertions.assertTrue(retInfo.getId() > 0);
         Assertions.assertEquals(count + 1, bookRepository.count());
         Assertions.assertEquals(bName, bookRepository.findByName(bName).getName());
         Assertions.assertEquals(retInfo.getName(), bName);
