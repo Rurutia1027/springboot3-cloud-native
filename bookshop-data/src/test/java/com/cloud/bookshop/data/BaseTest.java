@@ -9,6 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 // BaseTest should be extended by all businesses test cases
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-@Transactional
+//@Transactional
 public class BaseTest {
 }
