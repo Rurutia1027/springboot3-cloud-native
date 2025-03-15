@@ -9,12 +9,17 @@ import com.cloud.bookshop.dubbo.service.BookService;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.Objects;
 
 @DubboService
 @Service("bookService")
@@ -23,16 +28,30 @@ public class BookServiceImpl implements BookService {
     @Autowired
     private BookRepository bookRepository;
 
+    // another way to use cache
+    @Autowired
+    private CacheManager cacheManager;
+
     @ServiceLog
     @Override
+    @Cacheable(value = "books")
     public BookInfo getInfo(Long id) {
-        Book book = bookRepository.findById(id).get();
-        BookInfo bookRet = new BookInfo();
-        BeanUtils.copyProperties(book, bookRet);
-        return bookRet;
+        Cache.ValueWrapper value = cacheManager.getCache("books").get(id);
+        if (Objects.isNull(value)) {
+            Book book = bookRepository.findById(id).get();
+            BookInfo bookRet = new BookInfo();
+            // cache k,v pair to the cache with name of books
+            // which is managed via cache manager
+            BeanUtils.copyProperties(book, bookRet);
+            cacheManager.getCache("books").put(id, bookRet);
+        }
+
+        return (BookInfo) value.get();
     }
 
     @Override
+    //@Cacheable(cacheNames = "books", key = "#condition.name")
+    @CacheEvict(cacheNames = "books", allEntries = true, beforeInvocation = false)
     public Page<BookInfo> query(BookCondition condition, Pageable pageable) {
         return null;
     }
