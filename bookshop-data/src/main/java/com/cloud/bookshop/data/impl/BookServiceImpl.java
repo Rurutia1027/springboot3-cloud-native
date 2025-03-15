@@ -9,6 +9,7 @@ import com.cloud.bookshop.dubbo.service.BookService;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ public class BookServiceImpl implements BookService {
 
     @ServiceLog
     @Override
+    @Cacheable("books")
     public BookInfo getInfo(Long id) {
         Book book = bookRepository.findById(id).get();
         BookInfo bookRet = new BookInfo();
