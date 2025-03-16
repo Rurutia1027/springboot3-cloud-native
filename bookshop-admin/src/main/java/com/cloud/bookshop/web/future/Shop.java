@@ -25,12 +25,14 @@ public class Shop {
         }
     }
 
-    public double getPrice(String product) {
+    public String getPrice(String product) {
         delay();
-        return random.nextDouble() * 100;
+        double price = random.nextDouble() * 100;
+        Discount discount = Discount.values()[random.nextInt(Discount.values().length)];
+        return String.format("%s:%.2f:%s", getName(), price, discount);
     }
 
-    public Future<Double> getPriceAsync(String product) {
+    public Future<String> getPriceAsync(String product) {
         // method-1: this is not recommended
 //        CompletableFuture<Double> futurePrice = new CompletableFuture<>();
 //        new Thread(() -> futurePrice.complete(getPrice(product))).start();
@@ -45,9 +47,9 @@ public class Shop {
     public static void main(String[] args) throws ExecutionException, InterruptedException {
         Shop shop = new Shop("one shop");
         long start = System.currentTimeMillis();
-        Future<Double> futurePrice = shop.getPriceAsync("some product");
+        Future<String> futurePrice = shop.getPriceAsync("some product");
         System.out.println("invoke response time-consuming: " + (System.currentTimeMillis() - start));
-        double price = futurePrice.get();
+        String price = futurePrice.get();
         System.out.println("price invoke response time-consuming: " + (System.currentTimeMillis() - start));
 
     }

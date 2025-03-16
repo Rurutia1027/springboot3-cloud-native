@@ -66,8 +66,9 @@ public class PriceDemo {
 
     // time-consuming level: 25118:
     public List<String> findPrices_v1(String product) {
-        return shops.stream().map(mapper -> String.format("%s price is %.2f",
-                        mapper.getName(), mapper.getPrice(product)))
+        return shops.stream().map(item -> item.getPrice(product))
+                .map(Quote::parse)
+                .map(DiscountDemo::applyDiscount)
                 .collect(Collectors.toList());
     }
 
@@ -77,17 +78,24 @@ public class PriceDemo {
     // application behave low-effectively
     public List<String> findPrices_v2_parallel_stream(String product) {
         return shops.stream().parallel()
-                .map(mapper -> String.format("%s price is %.2f",
-                        mapper.getName(), mapper.getPrice(product)))
+                .map(item -> item.getPrice(product))
+                .map(Quote::parse)
+                .map(DiscountDemo::applyDiscount)
                 .collect(Collectors.toList());
     }
 
     // time-consuming level: 3019ms
     public List<String> findPrices_v3_completable_future(String product) {
-        List<CompletableFuture<String>> ret =
-                shops.stream().map(shop -> CompletableFuture.supplyAsync(() -> String.format(
-                                "%s price is %.2f", shop.getName(), shop.getPrice(product))))
-                        .collect(Collectors.toList());
+        List<CompletableFuture<String>> ret = shops.stream()
+                .map(shop -> CompletableFuture.supplyAsync(() -> shop.getPrice(product)))
+                // use #thenApply to handle sync operations
+                .map(future -> future.thenApply(Quote::parse))
+
+                // use #thenCompose to handle async operations
+                .map(future -> future.thenCompose(quote -> CompletableFuture.supplyAsync(() -> DiscountDemo.applyDiscount(quote))))
+                .collect(Collectors.toList());
+
+
         // join is similar as Future#get, but join does not throw exception during block period
         return ret.stream().map(CompletableFuture::join)
                 .collect(Collectors.toList());
@@ -98,12 +106,12 @@ public class PriceDemo {
     // time-consuming: 1034ms
     public List<String> findPrices_v4_thread_pool(String product) {
         Executor executor = Executors.newFixedThreadPool(Math.min(shops.size(), 100));
-
         List<CompletableFuture<String>> ret = shops.stream()
-                .map(shop -> CompletableFuture
-                        .supplyAsync(() -> String.format("%s price is %.2f", shop.getName(),
-                                shop.getPrice(product)), executor))
+                .map(shop -> CompletableFuture.supplyAsync(() -> shop.getPrice(product), executor))
+                .map(future -> future.thenApply(Quote::parse))
+                .map(future -> future.thenCompose(quote -> CompletableFuture.supplyAsync(() -> DiscountDemo.applyDiscount(quote))))
                 .collect(Collectors.toList());
+
         return ret.stream().map(CompletableFuture::join)
                 .collect(Collectors.toList());
     }
