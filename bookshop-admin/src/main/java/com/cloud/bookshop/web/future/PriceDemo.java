@@ -9,6 +9,21 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+// Thread Pool Size Best Practice:
+// N: processor's core number
+// U: expected CPU usage 0-1
+// W/C: waiting period / computing period --> whether it is computing intensive
+// T = N * U * (1 + W/C)
+
+
+// Conclusion of choosing parallel-stream or completable-future
+// S1: , then choose parallel-streaming
+// --> computing intensive & less I/O && avoid creating
+// --> threads number <= processor cores' num
+// ====
+// S2: , then choose completable-future
+// --> parallel unit contains I/O operations like File I/O or Network I/O --> then parallel
+// streaming is not a good chose, use completable-future + thread pool this combination
 public class PriceDemo {
     private List<Shop> shops = Lists.newArrayList(
             new Shop("shop1"),
@@ -37,6 +52,11 @@ public class PriceDemo {
             new Shop("shop24"),
             new Shop("shop25"));
 
+    private void getCoreProcessorInfo() {
+        int coreNum = Runtime.getRuntime().availableProcessors();
+        System.out.println(coreNum);
+    }
+
     // this function:
     // receives a product name, return a list of string that includes the name of the shop
     // that sells the project, and the product's price in that shop.l
@@ -52,7 +72,7 @@ public class PriceDemo {
     }
 
     // time-consuming level: 3017,
-    // conclusion: parallel streaming is suitable for handling compute dentensive scenarios
+    // conclusion: parallel streaming is suitable for handling compute intensive scenarios
     // if there associates rpc/relay remote invokes, parallel streaming will cause
     // application behave low-effectively
     public List<String> findPrices_v2_parallel_stream(String product) {
@@ -73,7 +93,8 @@ public class PriceDemo {
                 .collect(Collectors.toList());
     }
 
-    // conclusion: most effective combination: thread-pool & completable
+    // conclusion: most effective combination to resolve remote invoke & async scenario:
+    // thread-pool & completable
     // time-consuming: 1034ms
     public List<String> findPrices_v4_thread_pool(String product) {
         Executor executor = Executors.newFixedThreadPool(Math.min(shops.size(), 100));
@@ -89,6 +110,10 @@ public class PriceDemo {
 
     public static void main(String[] args) {
         PriceDemo priceDemo = new PriceDemo();
+
+        // 12
+        priceDemo.getCoreProcessorInfo();
+
         long start = System.currentTimeMillis();
         System.out.println(priceDemo.findPrices_v1("iPhone7"));
         System.out.println("original time-consuming " + (System.currentTimeMillis() - start));
@@ -103,13 +128,13 @@ public class PriceDemo {
         // completable future handle multi-threads
         start = System.currentTimeMillis();
         System.out.println(priceDemo.findPrices_v3_completable_future("macOS"));
-        System.out.println("v3 multi-thread complete-able time-consuming " + (System.currentTimeMillis() - start));
+        System.out.println("v3 multi-thread completable time-consuming " + (System.currentTimeMillis() - start));
 
 
-        // completeable future handle multi-threads with thread pool
+        // completable future handle multi-threads with thread pool
         start = System.currentTimeMillis();
         System.out.println(priceDemo.findPrices_v4_thread_pool(UUID.randomUUID().toString()));
-        System.out.println("v4 multi-thread with thread local via completeable " +
+        System.out.println("v4 multi-thread with thread local via completable " +
                 "time-consuming " + (System.currentTimeMillis() - start));
     }
 }
